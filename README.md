@@ -30,6 +30,11 @@ Initially, the value of **n = 9** was used to verify the correctness of the prog
 ## Source Code
 
 ![Source Code](Task1/task1_source_code_sum_to_5.jpeg)
+### Development Environment Snapshot
+
+The following screenshot shows the source code being created and edited within the development environment before compilation.
+
+![Program Editing Environment](Task1/task1_gcc_execution_sum_to_9.jpeg)
 
 ### Explanation
 
@@ -55,6 +60,13 @@ gcc sum1ton.c
 ## Output
 
 ![GCC Output](Task1/task1_gcc_output_sum_to_9.jpeg)
+### Terminal Execution Verification
+
+The following terminal snapshot confirms successful compilation and execution of the program for n = 9.
+
+![Execution for n = 9](Task1/task1_gcc_execution_sum_to_9.jpeg)
+
+The generated output matches the expected arithmetic sum of the first nine natural numbers.
 
 ### Observation
 
@@ -102,14 +114,20 @@ gcc sum1ton.c
 ## Output
 
 ![GCC Output for n = 100](Task1/task1_gcc_output_sum_to_100.jpeg)
+### Terminal Execution Verification
+
+The following screenshot shows successful recompilation and execution after updating the value of n from 9 to 100.
+
+![Execution for n = 100](Task1/task1_gcc_execution_sum_to_100.jpeg)
+
+The output verifies that the modified program correctly computes the sum of the first one hundred natural numbers.
+### Observation
 
 ### Observation
 
 For n = 100:
 
-\[
-\frac{100(100+1)}{2}=5050
-\]
+100 × 101 / 2 = 5050
 
 The obtained result matches the expected mathematical value.
 
@@ -197,20 +215,32 @@ riscv64-unknown-elf-gcc -O1 -mabi=lp64 -march=rv64i -c sum1ton.c
 
 ### What is O1 Optimization?
 
-`-O1` performs fundamental optimization techniques such as:
+`-O1` performs basic compiler optimizations while maintaining a structure that closely resembles the original source code.
+
+The optimizations include:
 
 - Dead code elimination
 - Constant propagation
-- Basic instruction scheduling
-- Simple loop optimization
+- Simple instruction scheduling
+- Basic loop optimization
+- Removal of redundant operations
 
 ### Observation
 
-The generated assembly preserves most of the original program structure and contains explicit loop-related instructions. This makes the generated assembly easier to understand while still improving performance compared to unoptimized code.
+The generated assembly still contains loop-related instructions that perform the summation operation during runtime.
+
+**Key observations:**
+
+- The loop structure is preserved.
+- Branch instructions are present.
+- Runtime calculations are performed inside the loop.
+- The generated code remains easy to correlate with the original C program.
+
+This optimization level improves execution efficiency while preserving code readability and debugging capability.
 
 ---
 
-# Step 9: Analysis of Ofast Optimization
+# Step 9: Analysis of OFast Optimization
 
 The same source code was compiled using the **-Ofast** optimization level.
 
@@ -220,56 +250,96 @@ The same source code was compiled using the **-Ofast** optimization level.
 riscv64-unknown-elf-gcc -Ofast -mabi=lp64 -march=rv64i -c sum1ton.c
 ```
 
-## Main Function Generated with Ofast
+## Main Function Generated with OFast
 
-![Ofast Optimization Analysis](Task1/task1_ofast_optimization_main_function.jpeg)
+![OFast Optimization Analysis](Task1/task1_ofast_optimization_main_function.jpeg)
 
-### What is Ofast Optimization?
+### What is OFast Optimization?
 
-`-Ofast` enables aggressive compiler optimizations including:
+`-Ofast` enables all optimizations available in `-O3` along with additional aggressive optimizations that prioritize maximum execution speed.
 
-- All optimizations provided by `-O3`
-- Function inlining
-- Advanced instruction scheduling
+The optimizations include:
+
 - Constant folding
-- Loop transformations
-- Performance-focused code generation
+- Constant propagation
+- Loop elimination
+- Aggressive instruction scheduling
+- Compile-time evaluation
+- Advanced code simplification
 
 ### Observation
 
-Compared to `-O1`, the generated assembly contains fewer instructions and more efficient execution paths. The compiler aggressively simplifies operations, resulting in improved runtime performance.
+Unlike the assembly generated with **-O1**, the loop is no longer present in the generated machine code.
+
+Since the value of `n` is known during compilation (`n = 100`), the compiler computes the final result at compile time and directly inserts the constant value into the assembly instructions.
+
+**Key observations:**
+
+- Loop instructions have been eliminated.
+- Branch instructions related to iteration are removed.
+- The final result is precomputed by the compiler.
+- Fewer instructions are generated.
+- Execution becomes faster due to reduced runtime computation.
+
+In the OFast version, the compiler effectively transforms the original iterative computation into a simplified sequence of instructions that directly prepares the output for the `printf()` function.
+
+### O1 vs OFast Comparison
+
+| Feature | O1 | OFast |
+|----------|----------|----------|
+| Loop Structure | Preserved | Eliminated |
+| Runtime Computation | Present | Reduced |
+| Instruction Count | Higher | Lower |
+| Code Readability | Easier to understand | More optimized |
+| Execution Speed | Moderate | Faster |
+| Compiler Aggressiveness | Basic | High |
+
+The comparison clearly demonstrates how higher optimization levels can significantly reduce instruction count and improve execution efficiency by performing calculations during compilation rather than at runtime.
 
 ---
 
-# Comparison of O1 and Ofast
+# Step 10: Execution of RISC-V Object Code
 
-| Feature | O1 | Ofast |
-|----------|----------|----------|
-| Optimization Level | Basic | Aggressive |
-| Instruction Count | Higher | Lower |
-| Code Readability | Easier | More Complex |
-| Execution Speed | Moderate | Faster |
-| Performance | Improved | Highly Optimized |
+After cross-compilation, the generated object file was executed using the Spike RISC-V simulator to verify correct functionality.
+
+## Command
+
+```bash
+spike pk sum1ton.o
+```
+
+## Execution Output
+
+![RISC-V Execution Output](Task1/task1_riscv_execution_output.jpeg)
+
+### Observation
+
+The simulator successfully executed the generated RISC-V object code and produced the expected output.
+
+This verifies that:
+
+- The cross-compilation process completed successfully.
+- The generated object file is compatible with the RISC-V architecture.
+- Program behavior remains consistent between native execution and simulated RISC-V execution.
+- The generated machine code correctly performs the intended computation.
 
 ---
 
 # Key Learning Outcomes
 
-- Understanding the GCC compilation workflow.
-- Learning RISC-V cross-compilation techniques.
-- Generating object files for the RV64I architecture.
-- Using `objdump` to analyze assembly instructions.
-- Understanding the relationship between C code and machine instructions.
-- Studying the impact of compiler optimization levels on generated code.
+- Understood the workflow of native compilation using GCC.
+- Learned the fundamentals of cross-compilation for the RISC-V architecture.
+- Generated RISC-V object code from a high-level C program.
+- Examined machine-level instructions using the `objdump` utility.
+- Compared assembly output produced under different optimization levels.
+- Analyzed the impact of compiler optimizations on instruction count and execution efficiency.
+- Verified successful execution of RISC-V object code using the Spike simulator.
+- Observed how compiler optimizations can transform iterative logic into highly optimized machine instructions.
 
 ---
 
 # Conclusion
 
-This task provided hands-on experience with both native compilation and RISC-V cross-compilation workflows. A C program was successfully developed, compiled, and executed using GCC. The same program was then cross-compiled for the RV64I architecture using the RISC-V GCC toolchain.
+This task provided practical exposure to both native compilation and RISC-V cross-compilation workflows. The generated assembly code was analyzed using `objdump`, enabling a deeper understanding of how high-level C statements are translated into architecture-specific instructions.
 
-The generated object code was analyzed using `objdump`, providing insight into how high-level C code is translated into assembly instructions. Furthermore, the comparison between `-O1` and `-Ofast` optimization levels demonstrated how compiler optimizations can significantly influence instruction count, code efficiency, and overall execution performance.
-
-This exercise established a strong foundation in compiler behavior, assembly analysis, and RISC-V software development.
-
-</details>
+Furthermore, comparison of **-O1** and **-Ofast** optimization levels demonstrated how compiler optimizations influence instruction generation, code size, and execution efficiency. Successful execution of the generated object code using the Spike simulator validated the correctness of the compilation process and reinforced the concepts of compiler optimization and RISC-V program analysis.
