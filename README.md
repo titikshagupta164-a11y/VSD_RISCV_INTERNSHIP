@@ -1,10 +1,14 @@
 # VSD_RISCV_INTERSHIP
-## Student Information
+## DETAILS
 
-| Field | Details |
-|--------|---------|
-| **Name** | Titiksha Gupta |
-| **Institute** | LNMIIT, Jaipur |
-| **Email** | titikshagupta164@gmail.com |
-| **GitHub** | [titikshagupta164-a11y](https://github.com/titikshagupta164-a11y) |
-| **LinkedIn** | [Titiksha Gupta](https://www.linkedin.com/) |
+**Titiksha Gupta**  
+*B.Tech, Electronics & Communication Engineering*  
+*The LNM Institute of Information Technology (LNMIIT), Jaipur*
+
+📧 **Email:** titikshagupta164@gmail.com
+
+💻 **GitHub:** https://github.com/titikshagupta164-a11y
+
+🔗 **LinkedIn:** https://www.linkedin.com/in/titiksha-gupta-
+
+---
