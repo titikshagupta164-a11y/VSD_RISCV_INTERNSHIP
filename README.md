@@ -25,7 +25,7 @@ The objective of this task is to understand the complete workflow of compiling a
 
 A simple C program was written to calculate the sum of natural numbers from **1 to n** using a loop.
 
-Initially, the value of **n = 9** was used to verify the correctness of the program logic.
+Initially, the value of **n = ** was used to verify the correctness of the program logic.
 
 ## Source Code
 
