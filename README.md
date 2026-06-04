@@ -12,3 +12,10 @@
 🔗 **LinkedIn:** https://www.linkedin.com/in/titiksha-gupta-
 
 ---
+<details>
+<summary><b>Task 1 : Compilation of C Program using GCC and RISC-V GCC Compiler</b></summary>
+
+<br>
+
+Write all your Task 1 content here.
+</details>
