@@ -25,16 +25,11 @@ The objective of this task is to understand the complete workflow of compiling a
 
 A simple C program was written to calculate the sum of natural numbers from **1 to n** using a loop.
 
-Initially, the value of **n = ** was used to verify the correctness of the program logic.
+Initially, the value of **n = 9** was used to verify the correctness of the program logic.
 
 ## Source Code
 
-![Source Code](Task1/task1_source_code_sum_to_5.jpeg)
-### Development Environment Snapshot
-
-The following screenshot shows the source code being created and edited within the development environment before compilation.
-
-![Program Editing Environment](Task1/task1_gcc_execution_sum_to_9.jpeg)
+![Source Code](Task1/task1_source_code_sum_to_9.png)
 
 ### Explanation
 
@@ -59,22 +54,21 @@ gcc sum1ton.c
 
 ## Output
 
-![GCC Output](Task1/task1_gcc_output_sum_to_9.jpeg)
+![GCC Output](Task1/task1_gcc_output_sum_to_9.png)
+
 ### Terminal Execution Verification
 
-The following terminal snapshot confirms successful compilation and execution of the program for n = 9.
+The following terminal snapshot confirms successful compilation and execution of the program for **n = 9**.
 
-![Execution for n = 9](Task1/task1_gcc_execution_sum_to_9.jpeg)
-
-The generated output matches the expected arithmetic sum of the first nine natural numbers.
+![Execution for n = 9](Task1/task1_gcc_execution_sum_to_9.png)
 
 ### Observation
 
 For n = 9:
 
-\[
+```text
 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 = 45
-\]
+```
 
 The output confirms that the program logic is functioning correctly.
 
@@ -86,7 +80,7 @@ To further validate the implementation, the value of `n` was modified from **9**
 
 ## Modified Source Code
 
-![Modified Source Code](Task1/task1_source_code_sum_to_100.jpeg)
+![Modified Source Code](Task1/task1_source_code_sum_to_100.png)
 
 The source file was then displayed using the `cat` command for verification.
 
@@ -96,7 +90,11 @@ The source file was then displayed using the `cat` command for verification.
 cat sum1ton.c
 ```
 
-![Source Verification](Task1/task1_terminal_source_listing.jpeg)
+![Source Verification](Task1/task1_terminal_source_listing.png)
+
+### Observation
+
+The source listing confirms that the value of `n` was successfully updated to 100 before recompilation.
 
 ---
 
@@ -113,21 +111,21 @@ gcc sum1ton.c
 
 ## Output
 
-![GCC Output for n = 100](Task1/task1_gcc_output_sum_to_100.jpeg)
+![GCC Output for n = 100](Task1/task1_gcc_output_sum_to_100.png)
+
 ### Terminal Execution Verification
 
-The following screenshot shows successful recompilation and execution after updating the value of n from 9 to 100.
+The following screenshot shows successful recompilation and execution after updating the value of `n` from 9 to 100.
 
-![Execution for n = 100](Task1/task1_gcc_execution_sum_to_100.jpeg)
-
-The output verifies that the modified program correctly computes the sum of the first one hundred natural numbers.
-### Observation
+![Execution for n = 100](Task1/task1_gcc_execution_sum_to_100.png)
 
 ### Observation
 
 For n = 100:
 
+```text
 100 × 101 / 2 = 5050
+```
 
 The obtained result matches the expected mathematical value.
 
@@ -137,7 +135,18 @@ The obtained result matches the expected mathematical value.
 
 The following screenshot shows the complete workflow of program editing, compilation, and execution within the development environment.
 
-![Compilation Workflow](Task1/task1_compilation_workflow.jpeg)
+![Compilation Workflow](Task1/task1_compilation_workflow.png)
+
+### Workflow Summary
+
+1. Create or edit the source code.
+2. Compile using GCC.
+3. Execute the generated binary.
+4. Verify the output.
+5. Modify the source code when required.
+6. Recompile and execute again.
+7. Cross-compile for the RISC-V architecture.
+8. Analyze generated machine instructions.
 
 ---
 
@@ -166,6 +175,10 @@ The compilation process generates the object file:
 sum1ton.o
 ```
 
+### Observation
+
+Cross compilation allows code developed on the host machine to be translated into machine instructions for the RISC-V processor architecture.
+
 ---
 
 # Step 7: Disassembling the Object File
@@ -180,7 +193,7 @@ riscv64-unknown-elf-objdump -d sum1ton.o
 
 ## Disassembly Output
 
-![RISC-V Disassembly](Task1/task1_riscv_objdump_disassembly.jpeg)
+![RISC-V Disassembly](Task1/task1_riscv_objdump_disassembly.png)
 
 ### Analysis
 
@@ -211,7 +224,7 @@ riscv64-unknown-elf-gcc -O1 -mabi=lp64 -march=rv64i -c sum1ton.c
 
 ## Main Function Generated with O1
 
-![O1 Optimization Analysis](Task1/task1_o1_optimization_main_function.jpeg)
+![O1 Optimization Analysis](Task1/task1_o1_optimization_main_function.png)
 
 ### What is O1 Optimization?
 
@@ -234,6 +247,7 @@ The generated assembly still contains loop-related instructions that perform the
 - The loop structure is preserved.
 - Branch instructions are present.
 - Runtime calculations are performed inside the loop.
+- Approximately 15 instructions are generated within the main routine.
 - The generated code remains easy to correlate with the original C program.
 
 This optimization level improves execution efficiency while preserving code readability and debugging capability.
@@ -252,7 +266,7 @@ riscv64-unknown-elf-gcc -Ofast -mabi=lp64 -march=rv64i -c sum1ton.c
 
 ## Main Function Generated with OFast
 
-![OFast Optimization Analysis](Task1/task1_ofast_optimization_main_function.jpeg)
+![OFast Optimization Analysis](Task1/task1_ofast_optimization_main_function.png)
 
 ### What is OFast Optimization?
 
@@ -278,19 +292,22 @@ Since the value of `n` is known during compilation (`n = 100`), the compiler com
 - Loop instructions have been eliminated.
 - Branch instructions related to iteration are removed.
 - The final result is precomputed by the compiler.
-- Fewer instructions are generated.
+- Approximately 12 instructions are generated.
+- Fewer instructions are generated overall.
 - Execution becomes faster due to reduced runtime computation.
 
 In the OFast version, the compiler effectively transforms the original iterative computation into a simplified sequence of instructions that directly prepares the output for the `printf()` function.
 
-### O1 vs OFast Comparison
+---
+
+# O1 vs OFast Comparison
 
 | Feature | O1 | OFast |
 |----------|----------|----------|
 | Loop Structure | Preserved | Eliminated |
 | Runtime Computation | Present | Reduced |
-| Instruction Count | Higher | Lower |
-| Code Readability | Easier to understand | More optimized |
+| Instruction Count | ~15 Instructions | ~12 Instructions |
+| Code Readability | Easier to Understand | More Optimized |
 | Execution Speed | Moderate | Faster |
 | Compiler Aggressiveness | Basic | High |
 
@@ -300,27 +317,21 @@ The comparison clearly demonstrates how higher optimization levels can significa
 
 # Step 10: Execution of RISC-V Object Code
 
-After cross-compilation, the generated object file was executed using the Spike RISC-V simulator to verify correct functionality.
-
-## Command
-
-```bash
-spike pk sum1ton.o
-```
+After cross-compilation, the generated object code was executed using the RISC-V simulation environment to verify correct functionality.
 
 ## Execution Output
 
-![RISC-V Execution Output](Task1/task1_riscv_execution_output.jpeg)
+![RISC-V Execution Output](Task1/task1_riscv_execution_output.png)
 
 ### Observation
 
-The simulator successfully executed the generated RISC-V object code and produced the expected output.
+The simulator successfully executed the generated RISC-V program and produced the expected output.
 
 This verifies that:
 
 - The cross-compilation process completed successfully.
-- The generated object file is compatible with the RISC-V architecture.
-- Program behavior remains consistent between native execution and simulated RISC-V execution.
+- The generated object code is compatible with the RISC-V architecture.
+- Program behavior remains consistent between native execution and RISC-V execution.
 - The generated machine code correctly performs the intended computation.
 
 ---
@@ -333,7 +344,7 @@ This verifies that:
 - Examined machine-level instructions using the `objdump` utility.
 - Compared assembly output produced under different optimization levels.
 - Analyzed the impact of compiler optimizations on instruction count and execution efficiency.
-- Verified successful execution of RISC-V object code using the Spike simulator.
+- Verified successful execution of RISC-V object code.
 - Observed how compiler optimizations can transform iterative logic into highly optimized machine instructions.
 
 ---
@@ -342,4 +353,6 @@ This verifies that:
 
 This task provided practical exposure to both native compilation and RISC-V cross-compilation workflows. The generated assembly code was analyzed using `objdump`, enabling a deeper understanding of how high-level C statements are translated into architecture-specific instructions.
 
-Furthermore, comparison of **-O1** and **-Ofast** optimization levels demonstrated how compiler optimizations influence instruction generation, code size, and execution efficiency. Successful execution of the generated object code using the Spike simulator validated the correctness of the compilation process and reinforced the concepts of compiler optimization and RISC-V program analysis.
+Furthermore, comparison of **-O1** and **-Ofast** optimization levels demonstrated how compiler optimizations influence instruction generation, code size, and execution efficiency. Successful execution of the generated code validated the correctness of the compilation process and reinforced the concepts of compiler optimization, assembly analysis, and RISC-V program execution.
+
+</details>
