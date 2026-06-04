@@ -315,27 +315,6 @@ The comparison clearly demonstrates how higher optimization levels can significa
 
 ---
 
-# Step 10: Execution of RISC-V Object Code
-
-After cross-compilation, the generated object code was executed using the RISC-V simulation environment to verify correct functionality.
-
-## Execution Output
-
-![RISC-V Execution Output](Task1/task1_riscv_execution_output.jpeg)
-
-### Observation
-
-The simulator successfully executed the generated RISC-V program and produced the expected output.
-
-This verifies that:
-
-- The cross-compilation process completed successfully.
-- The generated object code is compatible with the RISC-V architecture.
-- Program behavior remains consistent between native execution and RISC-V execution.
-- The generated machine code correctly performs the intended computation.
-
----
-
 # Key Learning Outcomes
 
 - Understood the workflow of native compilation using GCC.
