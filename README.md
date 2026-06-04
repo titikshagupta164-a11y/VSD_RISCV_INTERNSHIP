@@ -25,11 +25,11 @@ The objective of this task is to understand the complete workflow of compiling a
 
 A simple C program was written to calculate the sum of natural numbers from **1 to n** using a loop.
 
-Initially, the value of **n = 9** was used to verify the correctness of the program logic.
+Initially, the value of **n = 5** was used to verify the correctness of the program logic.
 
 ## Source Code
 
-![Source Code](Task1/task1_source_code_sum_to_9.png)
+![Source Code](Task1/task1_source_code_sum_to_5.jpeg)
 
 ### Explanation
 
@@ -54,13 +54,13 @@ gcc sum1ton.c
 
 ## Output
 
-![GCC Output](Task1/task1_gcc_output_sum_to_9.png)
+![GCC Output](Task1/task1_gcc_output_sum_to_9.jpeg)
 
 ### Terminal Execution Verification
 
 The following terminal snapshot confirms successful compilation and execution of the program for **n = 9**.
 
-![Execution for n = 9](Task1/task1_gcc_execution_sum_to_9.png)
+![Execution for n = 9](Task1/task1_gcc_execution_sum_to_9.jpeg)
 
 ### Observation
 
@@ -80,7 +80,7 @@ To further validate the implementation, the value of `n` was modified from **9**
 
 ## Modified Source Code
 
-![Modified Source Code](Task1/task1_source_code_sum_to_100.png)
+![Modified Source Code](Task1/task1_source_code_sum_to_100.jpeg)
 
 The source file was then displayed using the `cat` command for verification.
 
@@ -90,7 +90,7 @@ The source file was then displayed using the `cat` command for verification.
 cat sum1ton.c
 ```
 
-![Source Verification](Task1/task1_terminal_source_listing.png)
+![Source Verification](Task1/task1_terminal_source_listing.jpeg)
 
 ### Observation
 
@@ -111,13 +111,13 @@ gcc sum1ton.c
 
 ## Output
 
-![GCC Output for n = 100](Task1/task1_gcc_output_sum_to_100.png)
+![GCC Output for n = 100](Task1/task1_gcc_output_sum_to_100.jpeg)
 
 ### Terminal Execution Verification
 
 The following screenshot shows successful recompilation and execution after updating the value of `n` from 9 to 100.
 
-![Execution for n = 100](Task1/task1_gcc_execution_sum_to_100.png)
+![Execution for n = 100](Task1/task1_gcc_execution_sum_to_100.jpeg)
 
 ### Observation
 
@@ -135,7 +135,7 @@ The obtained result matches the expected mathematical value.
 
 The following screenshot shows the complete workflow of program editing, compilation, and execution within the development environment.
 
-![Compilation Workflow](Task1/task1_compilation_workflow.png)
+![Compilation Workflow](Task1/task1_compilation_workflow.jpeg)
 
 ### Workflow Summary
 
@@ -193,7 +193,7 @@ riscv64-unknown-elf-objdump -d sum1ton.o
 
 ## Disassembly Output
 
-![RISC-V Disassembly](Task1/task1_riscv_objdump_disassembly.png)
+![RISC-V Disassembly](Task1/task1_riscv_objdump_disassembly.jpeg)
 
 ### Analysis
 
@@ -224,7 +224,7 @@ riscv64-unknown-elf-gcc -O1 -mabi=lp64 -march=rv64i -c sum1ton.c
 
 ## Main Function Generated with O1
 
-![O1 Optimization Analysis](Task1/task1_o1_optimization_main_function.png)
+![O1 Optimization Analysis](Task1/task1_o1_optimization_main_function.jpeg)
 
 ### What is O1 Optimization?
 
@@ -266,7 +266,7 @@ riscv64-unknown-elf-gcc -Ofast -mabi=lp64 -march=rv64i -c sum1ton.c
 
 ## Main Function Generated with OFast
 
-![OFast Optimization Analysis](Task1/task1_ofast_optimization_main_function.png)
+![OFast Optimization Analysis](Task1/task1_ofast_optimization_main_function.jpeg)
 
 ### What is OFast Optimization?
 
@@ -321,7 +321,7 @@ After cross-compilation, the generated object code was executed using the RISC-V
 
 ## Execution Output
 
-![RISC-V Execution Output](Task1/task1_riscv_execution_output.png)
+![RISC-V Execution Output](Task1/task1_riscv_execution_output.jpeg)
 
 ### Observation
 
