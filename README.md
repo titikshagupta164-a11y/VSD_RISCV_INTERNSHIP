@@ -1,4 +1,4 @@
-# VSD_RISCV_INTERSHIP
+# VSD_RISCV_INTERNSHIP
 ## DETAILS
 
 **Titiksha Gupta**  
@@ -334,4 +334,9 @@ This task provided practical exposure to both native compilation and RISC-V cros
 
 Furthermore, comparison of **-O1** and **-Ofast** optimization levels demonstrated how compiler optimizations influence instruction generation, code size, and execution efficiency. Successful execution of the generated code validated the correctness of the compilation process and reinforced the concepts of compiler optimization, assembly analysis, and RISC-V program execution.
 
+</details>
+
+<details>
+<summary><b>Task 2.1: RISC-V Program Simulation using SPIKE</b></summary>
+content 
 </details>
