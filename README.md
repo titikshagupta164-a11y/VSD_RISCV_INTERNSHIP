@@ -358,7 +358,7 @@ gcc sum1ton.c
 
 ### Output
 
-![GCC Output](Task2/Verification%20of%20Program%20Output%20using%20GCC.png)
+![GCC Output](Task2/gcc_output.png)
 The program calculates the sum of integers from 1 to 100 and produces the expected result:
 
 ```text
