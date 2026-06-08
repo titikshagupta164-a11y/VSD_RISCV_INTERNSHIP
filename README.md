@@ -358,7 +358,7 @@ gcc sum1ton.c
 
 ### Output
 
-![GCC Output](gcc_output.png)
+![GCC Output](Task2/Verification%20of%20Program%20Output%20using%20GCC.png)
 The program calculates the sum of integers from 1 to 100 and produces the expected result:
 
 ```text
@@ -379,7 +379,7 @@ spike pk sum1ton.o
 
 ### Output
 
-![Verification of Program Output in SPIKE](Verification%20of%20Program%20Output%20in%20SPIKE.png)
+![Verification of Program Output in SPIKE](Task2/Verification%20of%20Program%20Output%20in%20SPIKE.png)
 
 The output obtained through SPIKE matches the GCC execution result, confirming successful simulation.
 
@@ -399,7 +399,7 @@ spike -d pk sum1ton.o
 
 The value of register `a2` was inspected before execution of the target instruction.
 
-![Inspection of Register a2 in SPIKE Debug Mode](Inspection%20of%20Register%20a2%20in%20SPIKE%20Debug%20Mode.png)
+![Inspection of Register a2 in SPIKE Debug Mode](Task2/Inspection%20of%20Register%20a2%20in%20SPIKE%20Debug%20Mode.png)
 
 At this stage, register `a2` contains:
 
@@ -413,7 +413,7 @@ At this stage, register `a2` contains:
 
 The debugger was used to execute instructions one step at a time, enabling detailed observation of program execution.
 
-![Single-Step Instruction Execution in SPIKE Debugger](Single-Step%20Instruction%20Execution%20in%20SPIKE%20Debugger.png)
+![Single-Step Instruction Execution in SPIKE Debugger](Task2/Single-Step%20Instruction%20Execution%20in%20SPIKE%20Debugger.png)
 
 This approach helps in understanding how individual instructions modify processor state.
 
@@ -429,7 +429,7 @@ lui a2, 0x1
 
 The value loaded into register `a2` was verified.
 
-![Effect of LUI Instruction on Register Contents](Effect%20of%20LUI%20Instruction%20on%20Register%20Contents.png)
+![Effect of LUI Instruction on Register Contents](Task2/Effect%20of%20LUI%20Instruction%20on%20Register%20Contents.png)
 
 ### Observation
 
@@ -445,7 +445,7 @@ This demonstrates the operation of the Load Upper Immediate (LUI) instruction.
 
 After subsequent instruction execution, the updated register values were examined.
 
-![Register Value Verification](modified%20a2.png)
+![Register Value Verification](Task2/modified%20a2.png)
 
 ### Observation
 
@@ -462,7 +462,7 @@ The observed values confirm that the instructions correctly modified the destina
 
 Before stack allocation, the value of the stack pointer (`sp`) was recorded.
 
-![Initial Stack Pointer](initial%20sp.png)
+![Initial Stack Pointer](Task2/initial%20sp.png)
 
 ### Initial Value
 
@@ -482,7 +482,7 @@ addi sp, sp, -16
 
 This instruction allocates stack space by decrementing the stack pointer.
 
-![Stack Pointer Analysis After ADDI Instruction Execution](Stack%20Pointer%20Analysis%20After%20ADDI%20Instruction%20Execution.png)
+![Stack Pointer Analysis After ADDI Instruction Execution](Task2/Stack%20Pointer%20Analysis%20After%20ADDI%20Instruction%20Execution.png)
 
 ### Observation
 
