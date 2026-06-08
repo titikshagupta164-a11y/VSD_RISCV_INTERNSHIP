@@ -522,3 +522,8 @@ This task demonstrated:
 
 These experiments provided practical exposure to the RISC-V software toolchain, simulation environment, and debugging workflow.
 </details>
+
+<details>
+<summary><b>Task 2.2: ATM SIMULATOR USING SPIKE AND GCC</b></summary>
+  (WIP)
+</details>
