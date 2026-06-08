@@ -338,5 +338,189 @@ Furthermore, comparison of **-O1** and **-Ofast** optimization levels demonstrat
 
 <details>
 <summary><b>Task 2.1: RISC-V Program Simulation using SPIKE</b></summary>
-content 
+# Task 2: SPIKE Simulation and Debugging using RISC-V GCC
+
+## Objective
+
+The objective of this task is to compile a C program, execute it using the SPIKE RISC-V simulator, and perform instruction-level debugging by examining register values and stack pointer behavior.
+
+---
+
+## 1. Compilation and Execution using GCC
+
+The source file `sum1ton.c` was compiled using GCC and executed successfully. The output confirms the correctness of the program.
+
+### Commands
+
+```bash
+gcc sum1ton.c
+./a.out
+```
+
+### Output
+
+![Verification of Program Output using GCC](Verification%20of%20Program%20Output%20using%20GCC.jpeg)
+
+The program calculates the sum of integers from 1 to 100 and produces the expected result:
+
+```text
+Sum from 1 to 100 is 5050
+```
+
+---
+
+## 2. Execution using SPIKE Simulator
+
+The generated RISC-V executable was executed using the SPIKE simulator along with the proxy kernel (`pk`).
+
+### Command
+
+```bash
+spike pk sum1ton.o
+```
+
+### Output
+
+![Verification of Program Output in SPIKE](Verification%20of%20Program%20Output%20in%20SPIKE.jpeg)
+
+The output obtained through SPIKE matches the GCC execution result, confirming successful simulation.
+
+---
+
+## 3. Launching SPIKE in Debug Mode
+
+To perform instruction-level analysis, SPIKE was launched in debug mode.
+
+### Command
+
+```bash
+spike -d pk sum1ton.o
+```
+
+### Register Inspection
+
+The value of register `a2` was inspected before execution of the target instruction.
+
+![Inspection of Register a2 in SPIKE Debug Mode](Inspection%20of%20Register%20a2%20in%20SPIKE%20Debug%20Mode.jpeg)
+
+At this stage, register `a2` contains:
+
+```text
+0x0000000000000000
+```
+
+---
+
+## 4. Single-Step Instruction Execution
+
+The debugger was used to execute instructions one step at a time, enabling detailed observation of program execution.
+
+![Single-Step Instruction Execution in SPIKE Debugger](Single-Step%20Instruction%20Execution%20in%20SPIKE%20Debugger.jpeg)
+
+This approach helps in understanding how individual instructions modify processor state.
+
+---
+
+## 5. Effect of the LUI Instruction
+
+The following instruction was executed:
+
+```assembly
+lui a2, 0x1
+```
+
+The value loaded into register `a2` was verified.
+
+![Effect of LUI Instruction on Register Contents](Effect%20of%20LUI%20Instruction%20on%20Register%20Contents.jpeg)
+
+### Observation
+
+```text
+a2 = 0x0000000000001000
+```
+
+This demonstrates the operation of the Load Upper Immediate (LUI) instruction.
+
+---
+
+## 6. Verification of Register Updates
+
+After subsequent instruction execution, the updated register values were examined.
+
+![Register Value Verification](modified%20a2.jpeg)
+
+### Observation
+
+```text
+a2 = 0x0000000000001000
+a0 = 0x0000000000021000
+```
+
+The observed values confirm that the instructions correctly modified the destination registers.
+
+---
+
+## 7. Initial Stack Pointer Analysis
+
+Before stack allocation, the value of the stack pointer (`sp`) was recorded.
+
+![Initial Stack Pointer](initial%20sp.jpeg)
+
+### Initial Value
+
+```text
+sp = 0x000000007f7e9b50
+```
+
+---
+
+## 8. Stack Pointer Modification using ADDI
+
+The following instruction was executed:
+
+```assembly
+addi sp, sp, -16
+```
+
+This instruction allocates stack space by decrementing the stack pointer.
+
+![Stack Pointer Analysis After ADDI Instruction Execution](Stack%20Pointer%20Analysis%20After%20ADDI%20Instruction%20Execution.jpeg)
+
+### Observation
+
+Before execution:
+
+```text
+sp = 0x000000007f7e9b50
+```
+
+After execution:
+
+```text
+sp = 0x000000007f7e9b40
+```
+
+Difference:
+
+```text
+16 bytes
+```
+
+The result confirms successful stack frame allocation.
+
+---
+
+## Conclusion
+
+This task demonstrated:
+
+- Compilation and execution of a C program using GCC.
+- Execution of a RISC-V binary using the SPIKE simulator.
+- Instruction-level debugging using SPIKE debug mode.
+- Inspection and verification of register contents.
+- Analysis of the `LUI` instruction and its effect on registers.
+- Observation of stack pointer updates during stack frame allocation.
+- Understanding of processor state changes through single-step execution.
+
+These experiments provided practical exposure to the RISC-V software toolchain, simulation environment, and debugging workflow.
 </details>
