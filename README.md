@@ -551,7 +551,7 @@ The generated assembly code was examined using Objdump, and instruction counts w
 
 ---
 
-# 🛠️ Tools Used
+# Tools Used
 
 | Tool          | Purpose                   |
 | ------------- | ------------------------- |
@@ -564,7 +564,7 @@ The generated assembly code was examined using Objdump, and instruction counts w
 
 ---
 
-# 💻 Source Code
+# Source Code
 
 The ATM Simulator is implemented in C using a menu-driven approach that allows users to perform basic banking transactions.
 
@@ -590,25 +590,25 @@ gcc atm_simulator.c
 
 ## Check Balance
 
-![Balance Output](TASK2.2./balance.jpeg)
+![Balance Output](TASK2.2/balance.jpeg)
 
 ---
 
 ## Deposit Money
 
-![Deposit Output](TASK2.2./deposit.jpeg)
+![Deposit Output](TASK2.2/deposit.jpeg)
 
 ---
 
 ## Withdraw Money
 
-![Withdrawal Output](TASK2.2./withdrawl.jpeg)
+![Withdrawal Output](TASK2.2/withdrawl.jpeg)
 
 ---
 
 ## Exit Application
 
-![Exit Output](TASK2.2./exit.jpeg)
+![Exit Output](TASK2.2/exit.jpeg)
 
 ---
 
@@ -628,7 +628,7 @@ ls -ltr atm_simulator.o
 
 ### Output
 
-![Object File Generation](TASK2.2./ltr.jpeg)
+![Object File Generation](TASK2.2/ltr.jpeg)
 
 ---
 
@@ -642,11 +642,11 @@ spike pk atm_simulator.o
 
 ### Initial SPIKE Execution
 
-![SPIKE Output](TASK2.2./spike_output.jpeg)
+![SPIKE Output](TASK2.2/spike_output.jpeg)
 
 ### Complete ATM Transaction Execution
 
-![SPIKE Transaction Output](TASK2.2./spike_output_2.jpeg)
+![SPIKE Transaction Output](TASK2.2/spike_output_2.jpeg)
 
 ---
 
@@ -655,12 +655,12 @@ spike pk atm_simulator.o
 ## Generate Assembly
 
 ```bash
-riscv64-unknown-elf-objdump -d atm_simulator.o > atm_dump.txt
+riscv64-unknown-elf-objdump -d atm_simulator.o | less
 ```
 
 ### Main Function Assembly
 
-![O1 Main Function](TASK2.2./o1_main.jpeg)
+![O1 Main Function](TASK2.2/o1_main.jpeg)
 
 ---
 
@@ -711,7 +711,7 @@ reg 0 sp
 
 ### Debug Output
 
-![O1 Debug Mode](TASK2.2./o1_spike_debug.jpeg)
+![O1 Debug Mode](TASK2.2/o1_spike_debug.jpeg)
 
 ---
 
@@ -735,7 +735,7 @@ riscv64-unknown-elf-objdump -d atm_simulator_fast.o > atm_fast_dump.txt
 
 ### Main Function Assembly
 
-![Ofast Main Function](TASK2.2./ofast_main.jpeg)
+![Ofast Main Function](TASK2.2/ofast_main.jpeg)
 
 ---
 
@@ -786,7 +786,7 @@ reg 0 sp
 
 ### Debug Output
 
-![Ofast Debug Mode](TASK2.2./ofast_spike_debug.jpeg)
+![Ofast Debug Mode](TASK2.2/ofast_spike_debug.jpeg)
 
 ---
 
