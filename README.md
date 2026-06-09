@@ -729,7 +729,7 @@ riscv64-unknown-elf-gcc -Ofast -mabi=lp64 -march=rv64i -o atm_simulator_fast.o a
 ## Generate Assembly
 
 ```bash
-riscv64-unknown-elf-objdump -d atm_simulator_fast.o > atm_fast_dump.txt
+riscv64-unknown-elf-objdump -d atm_simulator_fast.o | less
 ```
 
 ### Main Function Assembly
