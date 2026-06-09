@@ -527,7 +527,6 @@ These experiments provided practical exposure to the RISC-V software toolchain, 
 
 <details>
 <summary><b>Task 2.2: ATM SIMULATOR USING SPIKE AND GCC</b></summary>
-Copy-paste the following directly into **TASK2.2/README.md**.
 
 # ATM Transaction Simulator using RISC-V GCC and SPIKE
 
