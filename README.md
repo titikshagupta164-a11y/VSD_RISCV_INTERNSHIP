@@ -527,5 +527,302 @@ These experiments provided practical exposure to the RISC-V software toolchain, 
 
 <details>
 <summary><b>Task 2.2: ATM SIMULATOR USING SPIKE AND GCC</b></summary>
-  (WIP)
+Copy-paste the following directly into **TASK2.2/README.md**.
+
+# ATM Transaction Simulator using RISC-V GCC and SPIKE
+
+## Project Overview
+
+This project implements an ATM Transaction Simulator in C and demonstrates its execution on the RISC-V architecture using the RISC-V GCC Toolchain and SPIKE Simulator.
+
+The simulator supports the following operations:
+
+* Check Balance
+* Deposit Money
+* Withdraw Money
+* Exit Application
+
+The project was compiled and analyzed using two optimization levels:
+
+* `-O1`
+* `-Ofast`
+
+The generated assembly code was examined using Objdump, and instruction counts were calculated for comparison.
+
+---
+
+# 🛠️ Tools Used
+
+| Tool          | Purpose                   |
+| ------------- | ------------------------- |
+| C Programming | ATM Simulator Development |
+| GCC           | Native Compilation        |
+| RISC-V GCC    | Cross Compilation         |
+| SPIKE         | RISC-V ISA Simulation     |
+| Objdump       | Assembly Analysis         |
+| GitHub        | Documentation             |
+
+---
+
+# 💻 Source Code
+
+The ATM Simulator is implemented in C using a menu-driven approach that allows users to perform basic banking transactions.
+
+---
+
+# Native GCC Compilation
+
+## Compile
+
+```bash
+gcc atm_simulator.c
+```
+
+## Run
+
+```bash
+./a.out
+```
+
+---
+
+# Program Execution
+
+## Check Balance
+
+![Balance Output](TASK2.2./balance.jpeg)
+
+---
+
+## Deposit Money
+
+![Deposit Output](TASK2.2./deposit.jpeg)
+
+---
+
+## Withdraw Money
+
+![Withdrawal Output](TASK2.2./withdrawl.jpeg)
+
+---
+
+## Exit Application
+
+![Exit Output](TASK2.2./exit.jpeg)
+
+---
+
+# RISC-V Cross Compilation (-O1)
+
+## Compilation Command
+
+```bash
+riscv64-unknown-elf-gcc -O1 -mabi=lp64 -march=rv64i -o atm_simulator.o atm_simulator.c
+```
+
+## Object File Generation
+
+```bash
+ls -ltr atm_simulator.o
+```
+
+### Output
+
+![Object File Generation](TASK2.2./ltr.jpeg)
+
+---
+
+# SPIKE Simulation
+
+## Execute on SPIKE
+
+```bash
+spike pk atm_simulator.o
+```
+
+### Initial SPIKE Execution
+
+![SPIKE Output](TASK2.2./spike_output.jpeg)
+
+### Complete ATM Transaction Execution
+
+![SPIKE Transaction Output](TASK2.2./spike_output_2.jpeg)
+
+---
+
+# Objdump Analysis (-O1)
+
+## Generate Assembly
+
+```bash
+riscv64-unknown-elf-objdump -d atm_simulator.o > atm_dump.txt
+```
+
+### Main Function Assembly
+
+![O1 Main Function](TASK2.2./o1_main.jpeg)
+
+---
+
+## Instruction Count Calculation (-O1)
+
+### Main Function Address Information
+
+| Parameter     | Address |
+| ------------- | ------- |
+| Start Address | 0x10184 |
+| End Address   | 0x1039C |
+
+### Calculation
+
+```text
+Number of Instructions
+= (0x1039C - 0x10184) / 4
+
+= 0x218 / 4
+
+= 536 / 4
+
+= 134 Instructions
+```
+
+### Result
+
+| Optimization | Instruction Count |
+| ------------ | ----------------- |
+| -O1          | 134               |
+
+---
+
+# SPIKE Debug Mode (-O1)
+
+## Command
+
+```bash
+spike -d pk atm_simulator.o
+```
+
+### Commands Used
+
+```bash
+until pc 0 10184
+reg 0 sp
+```
+
+### Debug Output
+
+![O1 Debug Mode](TASK2.2./o1_spike_debug.jpeg)
+
+---
+
+# RISC-V Cross Compilation (-Ofast)
+
+## Compilation Command
+
+```bash
+riscv64-unknown-elf-gcc -Ofast -mabi=lp64 -march=rv64i -o atm_simulator_fast.o atm_simulator.c
+```
+
+---
+
+# Objdump Analysis (-Ofast)
+
+## Generate Assembly
+
+```bash
+riscv64-unknown-elf-objdump -d atm_simulator_fast.o > atm_fast_dump.txt
+```
+
+### Main Function Assembly
+
+![Ofast Main Function](TASK2.2./ofast_main.jpeg)
+
+---
+
+## Instruction Count Calculation (-Ofast)
+
+### Main Function Address Information
+
+| Parameter     | Address |
+| ------------- | ------- |
+| Start Address | 0x100B0 |
+| End Address   | 0x102C4 |
+
+### Calculation
+
+```text
+Number of Instructions
+= (0x102C4 - 0x100B0) / 4
+
+= 0x214 / 4
+
+= 532 / 4
+
+= 133 Instructions
+```
+
+### Result
+
+| Optimization | Instruction Count |
+| ------------ | ----------------- |
+| -Ofast       | 133               |
+
+---
+
+# SPIKE Debug Mode (-Ofast)
+
+## Command
+
+```bash
+spike -d pk atm_simulator_fast.o
+```
+
+### Commands Used
+
+```bash
+until pc 0 100b0
+reg 0 sp
+```
+
+### Debug Output
+
+![Ofast Debug Mode](TASK2.2./ofast_spike_debug.jpeg)
+
+---
+
+# Optimization Comparison
+
+| Parameter          | -O1     | -Ofast  |
+| ------------------ | ------- | ------- |
+| Main Start Address | 0x10184 | 0x100B0 |
+| Main End Address   | 0x1039C | 0x102C4 |
+| Instruction Count  | 134     | 133     |
+
+---
+
+# Observations
+
+* The ATM Simulator was successfully compiled using both `-O1` and `-Ofast` optimization levels.
+* The generated RISC-V object files executed correctly on the SPIKE simulator.
+* Objdump analysis was used to inspect the generated assembly instructions.
+* The instruction count for the `main()` function was calculated manually from the assembly output.
+* `-Ofast` generated slightly fewer instructions compared to `-O1`, indicating a more aggressive optimization strategy.
+* SPIKE debug mode enabled instruction-level execution and register inspection.
+
+---
+
+# Conclusion
+
+The ATM Transaction Simulator was successfully implemented in C and executed on the RISC-V architecture using SPIKE.
+
+This project demonstrates:
+
+* Native C program execution
+* Cross-compilation using RISC-V GCC
+* Simulation using SPIKE
+* Assembly code analysis using Objdump
+* Instruction count comparison across optimization levels
+* Instruction-level debugging using SPIKE Debug Mode
+
+The results confirm correct functionality of the ATM Simulator and provide insight into the effects of compiler optimizations on generated RISC-V assembly code.
 </details>
