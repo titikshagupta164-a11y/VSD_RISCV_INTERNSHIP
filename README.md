@@ -825,9 +825,6 @@ This project demonstrates:
 
 The results confirm correct functionality of the ATM Simulator and provide insight into the effects of compiler optimizations on generated RISC-V assembly code.
 </details>
-<details>
-<summary><b>Task 3:Environment Setup & RISC-V Reference Bring-Up</b></summary>
-  Use this as a new **Task 3 section**. It's professional, detailed, and ready to paste directly into your README.
 
 <details>
 <summary><b>Task 3: Environment Setup & RISC-V Reference Bring-Up</b></summary>
@@ -1059,5 +1056,3 @@ This task established a strong foundation for upcoming RTL design, FPGA integrat
 
 </details>
 
-
-</details>
