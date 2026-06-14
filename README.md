@@ -827,4 +827,237 @@ The results confirm correct functionality of the ATM Simulator and provide insig
 </details>
 <details>
 <summary><b>Task 3:Environment Setup & RISC-V Reference Bring-Up</b></summary>
+  Use this as a new **Task 3 section**. It's professional, detailed, and ready to paste directly into your README.
+
+<details>
+<summary><b>Task 3: Environment Setup & RISC-V Reference Bring-Up</b></summary>
+
+## Objective
+
+The objective of this task was to establish a complete RISC-V development environment, validate the functionality of the provided reference design, execute the VSD FPGA laboratory exercises, and prepare a local development setup for future FPGA and IP integration tasks.
+
+The task focused on:
+
+* Toolchain verification and readiness
+* Understanding the RISC-V software execution flow
+* Running a working RISC-V reference program
+* Executing VSDFPGA laboratory examples
+* Preparing a local Linux-based development environment
+* Understanding the integration of future FPGA IP blocks
+
+---
+
+# Development Environment
+
+## Cloud Environment
+
+* GitHub Codespaces
+* Pre-configured VSD RISC-V development container
+* RISC-V GCC Toolchain
+* Spike RISC-V ISA Simulator
+* Icarus Verilog
+
+## Local Environment
+
+* Oracle VirtualBox
+* Ubuntu Linux Virtual Machine
+* Local repository setup for future FPGA development
+
+---
+
+# Step 1: GitHub Codespaces Setup
+
+The official `vsd-riscv2` repository was forked and launched using GitHub Codespaces.
+
+The environment was verified successfully using:
+
+```bash
+riscv64-unknown-elf-gcc --version
+spike --version
+iverilog -V
+```
+
+This confirmed that the required RISC-V software toolchain and simulation tools were correctly installed and accessible.
+
+---
+
+# Step 2: RISC-V Reference Program Execution
+
+The reference RISC-V program available in the `samples` directory was compiled using the RISC-V cross-compiler and executed using the Spike simulator.
+
+## Compilation Command
+
+```bash
+riscv64-unknown-elf-gcc -o sum1ton.o sum1ton.c
+```
+
+## Execution Command
+
+```bash
+spike pk sum1ton.o
+```
+
+## Program Source
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int i, sum=0, n=100;
+
+    for(i=1;i<=n;i++)
+        sum += i;
+
+    printf("Sum from 1 to %d is %d\n", n, sum);
+
+    return 0;
+}
+```
+
+## Expected Output
+
+```text
+Sum from 1 to 100 is 5050
+```
+
+## Observed Output
+
+```text
+Sum from 1 to 100 is 5050
+```
+
+### Execution Snapshot
+
+![RISC-V Program Execution](images/task3_snap1.jpeg)
+
+---
+
+# Step 3: VSDFPGA Laboratory Execution
+
+After validating the RISC-V reference flow, the FPGA laboratory repository was executed within the same Codespaces environment.
+
+The firmware example was compiled and simulated successfully.
+
+## Firmware Build Process
+
+* Firmware source verification
+* Hex file generation
+* RISC-V compilation
+* Simulation using Spike
+
+## Observed Output
+
+```text
+LEARN TO THINK LIKE A CHIP
+VSDSQUADRON FPGA MINI
+BRINGS RISC-V TO VSD CLASSROOM
+```
+
+### Firmware Execution Snapshot
+
+![VSDFPGA Firmware Execution](images/task3_build.jpeg)
+
+---
+
+# Step 4: Local Machine Preparation
+
+To prepare for future FPGA development activities, the repositories were cloned on a local Ubuntu virtual machine.
+
+## Workspace Creation
+
+```bash
+mkdir ~/riscv_fpga_ip
+cd ~/riscv_fpga_ip
+```
+
+## Repository Cloning
+
+```bash
+git clone https://github.com/vsdip/vsd-riscv2.git
+
+git clone https://github.com/vsdip/vsdfpga_labs.git
+```
+
+## Verification
+
+```bash
+ls
+```
+
+Output:
+
+```text
+vsd-riscv2
+vsdfpga_labs
+```
+
+### Local Setup Snapshot
+
+![Local Ubuntu Setup](images/task3_vm.jpeg)
+
+---
+
+# Understanding Questions
+
+## Q1. Where is the RISC-V reference program located?
+
+The RISC-V reference program is located in the `samples` directory of the `vsd-riscv2` repository. This directory contains example programs used to verify the RISC-V toolchain and simulation flow.
+
+---
+
+## Q2. How is the program compiled and loaded into memory?
+
+The source file is compiled using the RISC-V cross-compiler (`riscv64-unknown-elf-gcc`) which generates a RISC-V executable binary.
+
+The executable is then executed using the Spike simulator through:
+
+```bash
+spike pk <program>
+```
+
+The Proxy Kernel (`pk`) loads the executable into simulated memory and manages execution.
+
+---
+
+## Q3. How does the RISC-V core access memory and memory-mapped I/O?
+
+The RISC-V processor accesses memory using standard load and store instructions.
+
+Memory-mapped peripherals are assigned dedicated address ranges within the system memory map. The processor communicates with these peripherals by reading from and writing to the corresponding addresses.
+
+---
+
+## Q4. Where would a new FPGA IP block logically integrate within the system?
+
+A new FPGA IP block would typically be integrated as a memory-mapped peripheral connected to the SoC interconnect.
+
+This allows the RISC-V processor to access the IP block through standard memory transactions without requiring special instructions.
+
+---
+
+# Key Learning Outcomes
+
+Through this task, the following concepts were understood and validated:
+
+* RISC-V software compilation flow
+* Cross-compilation using the RISC-V GCC toolchain
+* Program execution using the Spike simulator
+* Firmware build and simulation process
+* Repository management in GitHub Codespaces
+* Local Linux development environment preparation
+* Memory-mapped peripheral architecture
+* Foundation concepts for future FPGA and SoC integration tasks
+
+---
+
+# Conclusion
+
+The development environment was successfully configured and validated. The reference RISC-V application executed correctly, the VSDFPGA laboratory exercises were completed successfully, and a local Ubuntu-based development environment was prepared.
+
+This task established a strong foundation for upcoming RTL design, FPGA integration, and custom IP development activities in the VSD RISC-V Internship program.
+
+</details>
+
+
 </details>
