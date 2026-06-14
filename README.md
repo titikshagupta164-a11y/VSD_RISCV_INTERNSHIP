@@ -926,7 +926,7 @@ Sum from 1 to 100 is 5050
 
 ### Execution Snapshot
 
-![RISC-V Program Execution](images/task3_snap1.jpeg)
+![RISC-V Program Execution](TASK3/snap1.jpeg)
 
 ---
 
@@ -953,7 +953,7 @@ BRINGS RISC-V TO VSD CLASSROOM
 
 ### Firmware Execution Snapshot
 
-![VSDFPGA Firmware Execution](images/task3_build.jpeg)
+!![VSDFPGA Firmware Execution](TASK3/build.jpeg)
 
 ---
 
@@ -991,7 +991,7 @@ vsdfpga_labs
 
 ### Local Setup Snapshot
 
-![Local Ubuntu Setup](images/task3_vm.jpeg)
+![Local Ubuntu Setup](TASK3/vm.jpeg)
 
 ---
 
