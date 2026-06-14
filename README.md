@@ -825,3 +825,6 @@ This project demonstrates:
 
 The results confirm correct functionality of the ATM Simulator and provide insight into the effects of compiler optimizations on generated RISC-V assembly code.
 </details>
+<details>
+<summary><b>Task 3:Environment Setup & RISC-V Reference Bring-Up</b></summary>
+</details>
