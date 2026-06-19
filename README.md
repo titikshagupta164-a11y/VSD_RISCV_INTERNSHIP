@@ -1055,4 +1055,460 @@ The development environment was successfully configured and validated. The refer
 This task established a strong foundation for upcoming RTL design, FPGA integration, and custom IP development activities in the VSD RISC-V Internship program.
 
 </details>
+<details>
+<summary><b>Task 4: Design & Integrate Your First Memory-Mapped IP </b></summary>
 
+## Objective
+
+The objective of this task was to understand the existing RISC-V System-on-Chip (SoC) architecture, design a custom General Purpose Input Output (GPIO) peripheral, integrate it into the memory-mapped I/O framework of the SoC, and validate its operation through simulation.
+
+This task involved studying the existing peripheral interface, creating a standalone GPIO RTL module, connecting it to the processor bus, writing firmware to access the GPIO register, and verifying the complete functionality using simulation and waveform analysis.
+
+---
+
+# Step 1: Understanding the Existing SoC
+
+Before implementing the GPIO peripheral, the architecture of the provided RISC-V SoC was analyzed.
+
+The SoC follows a memory-mapped I/O approach, where peripherals are assigned specific address locations within the processor address space. The processor communicates with peripherals using standard memory read and write operations.
+
+The following observations were made during the analysis:
+
+- The processor generates memory addresses through the `mem_addr` bus.
+- Read and write operations are controlled through `mem_rstrb` and `mem_wmask`.
+- Existing peripherals such as LEDs and UART are already connected through the memory-mapped I/O interface.
+- Peripheral selection is performed using address decoding logic based on `mem_wordaddr`.
+- Data from peripherals is returned to the processor through the `mem_rdata` bus.
+
+## Project Structure
+
+![Project Structure](TASK4/1_t4.jpeg)
+
+### GPIO Address Decode Identification
+
+The existing address decoding mechanism was studied to determine how a new peripheral could be integrated into the SoC.
+
+A dedicated decode bit was assigned for the GPIO peripheral:
+
+```verilog
+localparam IO_GPIO_bit = 3;
+```
+
+This decode bit is used to identify accesses directed toward the GPIO peripheral.
+
+### Screenshot
+
+![GPIO Decode Bit](TASK4/3_t4.jpeg)
+
+---
+
+# Step 2: GPIO RTL Design
+
+A custom RTL module named `gpio_output.v` was developed to implement the GPIO peripheral.
+
+The module contains:
+
+- A 32-bit register for storing GPIO data.
+- Synchronous write logic triggered on the rising edge of the clock.
+- Reset functionality for initialization.
+- Readback support allowing software to retrieve stored values.
+- Continuous output assignment to expose the register contents.
+
+## GPIO RTL Implementation
+
+```verilog
+module gpio_output(
+    input clk,
+    input resetn,
+    input gpio_sel,
+    input gpio_we,
+    input [31:0] gpio_wdata,
+    output reg [31:0] gpio_rdata,
+    output [31:0] gpio_out
+);
+```
+
+### Working Principle
+
+#### Reset Operation
+
+Whenever the active-low reset signal is asserted, the GPIO register is cleared.
+
+```verilog
+if(!resetn)
+    gpio_reg <= 32'd0;
+```
+
+#### Write Operation
+
+When both the GPIO select signal and write enable signal are active, the incoming write data is stored inside the GPIO register.
+
+```verilog
+if(gpio_sel && gpio_we)
+    gpio_reg <= gpio_wdata;
+```
+
+#### Read Operation
+
+When the GPIO peripheral is selected, the stored register value is placed on the read data bus.
+
+```verilog
+gpio_rdata = gpio_reg;
+```
+
+#### Output Operation
+
+The GPIO output always reflects the current value stored in the GPIO register.
+
+```verilog
+assign gpio_out = gpio_reg;
+```
+
+### RTL Screenshot
+
+![GPIO RTL](TASK4/2_t4.jpeg)
+
+---
+
+# Step 3: GPIO Integration into the SoC
+
+After creating the GPIO RTL module, it was integrated into the SoC top level.
+
+The integration process consisted of address decoding, module instantiation, bus connection, and readback integration.
+
+## GPIO Address Decoding
+
+The processor accesses peripherals through memory-mapped addresses.
+
+The GPIO select signal was generated using:
+
+```verilog
+assign gpio_sel = isIO & mem_wordaddr[IO_GPIO_bit];
+```
+
+### Explanation
+
+- `isIO` indicates that the processor is accessing the I/O region.
+- `mem_wordaddr` contains the decoded word address.
+- `IO_GPIO_bit` uniquely identifies the GPIO peripheral.
+- When this bit becomes active, the GPIO peripheral is selected.
+
+### Screenshot
+
+![GPIO Decode](TASK4/3_t4.jpeg)
+
+---
+
+## GPIO Module Instantiation
+
+The GPIO module was instantiated inside the SoC and connected to the processor bus signals.
+
+```verilog
+gpio_output custom_gpio_inst(
+    .clk(clk),
+    .resetn(resetn),
+    .gpio_sel(gpio_sel),
+    .gpio_we(mem_wstrb),
+    .gpio_wdata(mem_wdata),
+    .gpio_rdata(gpio_rdata),
+    .gpio_out(GPIO_OUT)
+);
+```
+
+### Explanation
+
+The connections perform the following functions:
+
+| Signal | Purpose |
+|----------|----------|
+| clk | System clock |
+| resetn | Active-low reset |
+| gpio_sel | Peripheral selection |
+| mem_wstrb | Write enable |
+| mem_wdata | Data from CPU |
+| gpio_rdata | Read data to CPU |
+| GPIO_OUT | GPIO output |
+
+### Screenshot
+
+![GPIO Instance](TASK4/4_t4.jpeg)
+
+---
+
+## GPIO Readback Integration
+
+To allow software to read the GPIO register, the GPIO read data was added to the SoC readback multiplexer.
+
+```verilog
+: gpio_rdata
+```
+
+### Explanation
+
+When the processor performs a read operation targeting the GPIO address, the stored GPIO register value is returned through the `mem_rdata` bus.
+
+### Screenshot
+
+![GPIO Readback](TASK4/5_t4.jpeg)
+
+---
+
+# Step 4: Firmware Development and Simulation
+
+To validate the GPIO peripheral, a simple firmware application was developed.
+
+The firmware writes multiple test values into the GPIO register.
+
+## Firmware Source Code
+
+```c
+#define GPIO_ADDR 0x00400020
+
+volatile unsigned int *gpio =
+    (volatile unsigned int *)GPIO_ADDR;
+
+void main()
+{
+    *gpio = 0xABCDEF12;
+    *gpio = 0xA0A0A0A0;
+    *gpio = 0x02468135;
+
+    while(1);
+}
+```
+
+### Explanation
+
+The program:
+
+1. Defines the GPIO base address.
+2. Creates a pointer to the GPIO register.
+3. Writes three different values to the peripheral.
+4. Keeps running indefinitely.
+
+The final value written is:
+
+```text
+0x02468135
+```
+
+### Firmware Screenshot
+
+![Firmware Source](TASK4/6_t4.jpeg)
+
+---
+
+## Firmware Compilation
+
+The firmware was compiled using the RISC-V cross-compilation toolchain.
+
+The resulting executable was converted into a BRAM HEX file which is loaded into the SoC memory.
+
+### BRAM HEX Generation
+
+![BRAM HEX Generation](TASK4/bram_hex_t4.jpeg)
+
+---
+
+## Firmware Verification
+
+The generated firmware image was successfully copied to the RTL directory.
+
+This confirms that the simulation will execute the newly generated firmware instead of the default firmware.
+
+### Firmware Build Status
+
+![Firmware Build](TASK4/7_t4.jpeg)
+
+### Firmware Verification
+
+![Firmware Verification](TASK4/8_t4.jpeg)
+
+---
+
+## Simulation Execution
+
+Simulation was performed using Icarus Verilog.
+
+### Commands Used
+
+```bash
+iverilog -DBENCH -o sim2.vvp riscv.v gpio_output.v ice40_stubs.v
+
+vvp sim2.vvp
+
+gtkwave sim2.vcd
+```
+
+### Purpose
+
+- `iverilog` compiles the design.
+- `vvp` executes the simulation.
+- `gtkwave` visualizes signal activity.
+
+### Simulation Log
+
+![Simulation Log](TASK4/9_t4.jpeg)
+
+---
+
+# GTKWave Verification
+
+The generated waveform was analyzed using GTKWave.
+
+The following signals were monitored:
+
+- clk
+- resetn
+- gpio_sel
+- mem_addr
+- mem_wdata
+- GPIO_OUT
+
+### Observations
+
+1. Clock signal is active.
+2. Reset signal is released.
+3. GPIO peripheral is selected through address decoding.
+4. Data is written from the processor into the GPIO register.
+5. GPIO output updates correctly.
+
+### Final GPIO Value
+
+```text
+0x02468135
+```
+
+This value matches the last value written by the firmware, confirming successful operation.
+
+### Waveform Screenshot
+
+![GTKWave Verification](TASK4/10_t4.jpeg)
+
+---
+
+# Submission Requirements
+
+## GPIO IP RTL File
+
+The GPIO peripheral was implemented in:
+
+```text
+RTL/gpio_output.v
+```
+
+The RTL file contains:
+
+- Register storage
+- Write logic
+- Readback logic
+- Reset functionality
+
+---
+
+## SoC Integration Description
+
+The GPIO peripheral was integrated into the SoC by:
+
+1. Creating a dedicated GPIO RTL module.
+2. Assigning a unique decode bit (`IO_GPIO_bit = 3`).
+3. Generating a GPIO select signal using address decoding.
+4. Instantiating the GPIO module in the SoC top level.
+5. Connecting processor write data and control signals.
+6. Integrating GPIO readback into the SoC read path.
+7. Routing the GPIO output to the system output bus.
+
+This integration enables the processor to communicate with the GPIO peripheral through memory-mapped I/O transactions.
+
+---
+
+## Simulation Proof
+
+Simulation was successfully completed and verified using GTKWave.
+
+Evidence provided in this report includes:
+
+- Firmware compilation log
+- BRAM HEX generation log
+- Firmware loading verification
+- Simulation execution log
+- GTKWave waveform screenshot
+
+These results confirm successful operation of the GPIO peripheral.
+
+---
+
+# Short Explanation
+
+## Address Used
+
+The GPIO peripheral was assigned the memory-mapped base address:
+
+```text
+0x00400020
+```
+
+This address belongs to the I/O address region of the SoC. Whenever the processor accesses this address, the GPIO peripheral is selected through the address decoding logic and responds to the operation.
+
+---
+
+## How CPU Accesses the GPIO IP
+
+The processor accesses the GPIO peripheral through memory-mapped I/O.
+
+From the software perspective, the GPIO register behaves like a normal memory location.
+
+### Write Example
+
+```c
+*gpio = 0x02468135;
+```
+
+### Read Example
+
+```c
+value = *gpio;
+```
+
+The CPU performs the following sequence:
+
+1. Places the GPIO address on the address bus.
+2. Places data on the write data bus.
+3. Activates the write enable signal.
+4. Address decoding logic selects the GPIO peripheral.
+5. The GPIO register stores the incoming value.
+6. The GPIO output updates accordingly.
+
+For read operations, the stored GPIO value is returned through the processor read data bus.
+
+---
+
+## What Was Validated in Simulation
+
+The simulation verified the complete functionality of the GPIO peripheral.
+
+The following features were successfully validated:
+
+- Correct memory-mapped address decoding.
+- Successful GPIO module instantiation.
+- Proper write operation.
+- Register storage behavior.
+- GPIO output update.
+- Readback path integration.
+- Correct processor-to-peripheral communication.
+- Successful execution of firmware-generated writes.
+
+The final waveform showed the GPIO output reaching:
+
+```text
+0x02468135
+```
+
+which exactly matches the last value written by the firmware.
+
+---
+
+# Conclusion
+
+A custom 32-bit GPIO peripheral was successfully designed, integrated, and verified within the RISC-V SoC environment. The peripheral correctly responded to memory-mapped accesses, stored processor-generated data, and reflected the expected output value during simulation. The successful waveform verification confirms correct RTL functionality, SoC integration, firmware interaction, and overall system operation.
+</details>
