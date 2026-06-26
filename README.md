@@ -1512,3 +1512,422 @@ which exactly matches the last value written by the firmware.
 
 A custom 32-bit GPIO peripheral was successfully designed, integrated, and verified within the RISC-V SoC environment. The peripheral correctly responded to memory-mapped accesses, stored processor-generated data, and reflected the expected output value during simulation. The successful waveform verification confirms correct RTL functionality, SoC integration, firmware interaction, and overall system operation.
 </details>
+<details>
+<summary><b>Task 5: Design a Multi-Register GPIO IP with Software Control</b></summary>
+    # Design of a Multi-Register GPIO IP with Software Control
+
+## Overview
+
+This project implements a **Multi-Register GPIO IP** integrated into a RISC-V SoC. The design extends the basic GPIO peripheral by introducing multiple memory-mapped registers for GPIO data, direction control, and readback functionality.
+
+The GPIO IP enables software running on the RISC-V processor to configure GPIO pins as inputs or outputs, drive output values, and read current GPIO states through memory-mapped I/O.
+
+The implementation was validated using firmware written in C and simulated using **Icarus Verilog (iverilog)** and **GTKWave**.
+
+---
+
+# Project Objectives
+
+The objectives of this task were to:
+
+- Design a realistic multi-register GPIO peripheral.
+- Implement memory-mapped register access.
+- Support GPIO direction configuration.
+- Support GPIO output control.
+- Support GPIO input readback.
+- Integrate the GPIO IP into the SoC.
+- Validate functionality through firmware and simulation.
+
+---
+
+# Repository Structure
+
+```
+TASK5/
+│
+├── README.md
+├── gpio_control.v
+├── riscv.v
+├── gpio_test.c
+├── io.h
+├── gtk_task4.jpeg
+├── 1_t5.jpeg
+├── 2_t5.jpeg
+├── ...
+└── 13_t5.jpeg
+```
+
+---
+
+# GPIO Register Map
+
+| Offset | Register | Description |
+|---------|----------|-------------|
+| **0x00** | GPIO_DATA | Stores GPIO output values |
+| **0x04** | GPIO_DIR | Controls GPIO direction (1 = Output, 0 = Input) |
+| **0x08** | GPIO_READ | Returns current GPIO pin values |
+
+This register map allows software to control the GPIO peripheral using standard memory-mapped I/O transactions.
+
+---
+
+# GPIO IP Architecture
+
+The GPIO controller receives memory transactions from the CPU and updates internal registers based on the selected register address.
+
+![](TASK5/1_t5.jpeg)
+
+The GPIO module contains:
+
+- GPIO Data Register
+- GPIO Direction Register
+- Readback Logic
+- Address Decoder
+- Register Selection Logic
+
+---
+
+# Internal Registers
+
+The GPIO controller maintains two internal registers.
+
+![](TASK5/2_t5.jpeg)
+
+### GPIO Data Register
+
+Stores the output value driven to GPIO pins.
+
+```verilog
+reg [31:0] gpio_data_reg;
+```
+
+### GPIO Direction Register
+
+Controls whether each GPIO pin acts as an input or output.
+
+```verilog
+reg [31:0] gpio_dir_reg;
+```
+
+Each bit independently controls one GPIO pin.
+
+---
+
+# Register Selection
+
+The GPIO controller decodes address bits to determine which register is being accessed.
+
+![](TASK5/5_t5.jpeg)
+
+Register encoding:
+
+| reg_sel | Register |
+|----------|----------|
+| 00 | GPIO_DATA |
+| 01 | GPIO_DIR |
+| 10 | GPIO_READ |
+
+This minimizes hardware complexity while supporting multiple registers.
+
+---
+
+# Write Logic
+
+Write operations occur only when both the peripheral select signal and write enable signal are asserted.
+
+![](TASK5/4_t5.jpeg)
+
+The write logic performs:
+
+- Writing GPIO output values
+- Writing GPIO direction values
+
+```verilog
+if(sel && we)
+```
+
+The case statement selects the appropriate register and updates its contents.
+
+---
+
+# Read Logic
+
+Read operations return the contents of the selected register.
+
+![](TASK5/3_t5.jpeg)
+
+Depending on `reg_sel`, the module returns:
+
+- GPIO_DATA
+- GPIO_DIR
+- GPIO_READ
+
+This enables software to read back previously written values and current GPIO states.
+
+---
+
+# GPIO Readback Logic
+
+The GPIO readback logic combines output and input values based on the configured direction.
+
+![](TASK5/9_t5.jpeg)
+
+The implemented logic is:
+
+```verilog
+assign gpio_read_val =
+    (gpio_dir_reg & gpio_data_reg) |
+    (~gpio_dir_reg & gpio_in);
+```
+
+### Working
+
+If a GPIO pin is configured as an **output**, the readback returns the value stored in `gpio_data_reg`.
+
+If a GPIO pin is configured as an **input**, the readback returns the external GPIO input.
+
+| Direction Bit | Mode | Read Value |
+|---------------|------|------------|
+| 1 | Output | GPIO_DATA |
+| 0 | Input | GPIO_IN |
+
+This behavior matches real-world GPIO peripherals.
+
+---
+
+# Output Assignments
+
+The output signals are directly connected to the internal registers.
+
+![](TASK5/6_t5.jpeg)
+
+```verilog
+assign gpio_out = gpio_data_reg;
+assign gpio_oe  = gpio_dir_reg;
+```
+
+Where:
+
+- `gpio_out` drives GPIO output values.
+- `gpio_oe` enables output drivers according to the direction register.
+
+---
+
+# SoC Integration
+
+The GPIO controller is instantiated inside the SoC and connected to the processor's memory interface.
+
+![](TASK5/10_t5.jpeg)
+
+The CPU communicates with the GPIO controller using:
+
+- Address bus
+- Write data bus
+- Read data bus
+- Write enable
+- Peripheral select
+
+The GPIO peripheral behaves like any other memory-mapped device in the system.
+
+---
+
+# Firmware Validation
+
+The functionality of the GPIO IP was verified using a C program.
+
+![](TASK5/8_t5.jpeg)
+
+The firmware performs the following operations:
+
+### Test 1
+
+- Direction = 0xFF
+- Data = 0xFF
+
+Expected:
+
+- All GPIO pins configured as outputs.
+- Output value = 0xFF.
+
+---
+
+### Test 2
+
+- Direction = 0xFF
+- Data = 0xAA
+
+Expected:
+
+- Alternate GPIO bits driven HIGH.
+
+---
+
+### Test 3
+
+- Direction = 0x0F
+- Data = 0xFF
+
+Expected:
+
+- Lower four pins operate as outputs.
+- Upper four pins operate as inputs.
+
+---
+
+### Test 4
+
+- Direction = 0x0F
+- Data = 0xAA
+
+Expected:
+
+- Mixed input/output operation.
+
+---
+
+### Test 5
+
+- Direction = 0x00
+- Data = 0x00
+
+Expected:
+
+- All GPIO pins operate as inputs.
+
+---
+
+# Firmware Compilation
+
+The firmware was compiled into a BRAM image using the provided build system.
+
+![](TASK5/7_t5.jpeg)
+
+The generated firmware image was loaded into the SoC simulation for execution.
+
+---
+
+# RTL Simulation
+
+The complete SoC was simulated using Icarus Verilog.
+
+![](TASK5/11_t5.jpeg)
+
+Simulation commands:
+
+```bash
+iverilog -DBENCH -o sim3.vvp ice40_stubs.v gpio_control.v riscv.v
+vvp sim3.vvp
+```
+
+The simulation successfully generated the waveform file viewed in GTKWave.
+
+---
+
+# GTKWave Results
+
+The generated waveform verifies correct GPIO operation.
+
+![](TASK5/gtk_task4.jpeg)
+
+The waveform shows:
+
+- Clock operation
+- Register selection
+- Write transactions
+- GPIO data updates
+- Direction register updates
+- GPIO output enable changes
+- GPIO readback values
+
+The simulation confirms correct interaction between software and hardware.
+
+---
+
+# Address Offset Decoding
+
+The GPIO peripheral occupies one base address in memory and internally decodes register offsets.
+
+| Offset | Register |
+|---------|----------|
+| Base + 0x00 | GPIO_DATA |
+| Base + 0x04 | GPIO_DIR |
+| Base + 0x08 | GPIO_READ |
+
+The lower address bits are decoded into the `reg_sel` signal.
+
+```
+reg_sel = addr[3:2]
+```
+
+This allows multiple registers to share a common peripheral base address while remaining individually accessible.
+
+---
+
+# Effect of Direction Register
+
+The direction register determines whether a GPIO pin behaves as an input or an output.
+
+| GPIO_DIR | Pin Mode | GPIO_READ Returns |
+|----------|----------|------------------|
+| 1 | Output | GPIO_DATA |
+| 0 | Input | GPIO_IN |
+
+When configured as an output:
+
+- Output driver is enabled.
+- GPIO_DATA is driven to the pin.
+
+When configured as an input:
+
+- Output driver is disabled.
+- External GPIO value is read.
+
+This behavior closely resembles the GPIO peripherals used in commercial microcontrollers and SoCs.
+
+---
+
+# Results
+
+The implemented GPIO IP successfully demonstrates:
+
+- Multi-register peripheral design
+- Memory-mapped register interface
+- GPIO direction control
+- GPIO output control
+- GPIO readback functionality
+- Firmware-driven hardware control
+- Successful RTL simulation
+
+---
+## Project Summary
+
+This project focuses on enhancing a basic GPIO peripheral by transforming it into a more realistic **multi-register GPIO IP** that can be controlled entirely through software. Instead of using a single register, the design introduces separate memory-mapped registers for **GPIO Data**, **GPIO Direction**, and **GPIO Read**, allowing the processor to configure and access the peripheral efficiently. The GPIO IP is integrated into a RISC-V System-on-Chip (SoC), where the CPU communicates with it through memory-mapped I/O. A C firmware application is developed to write to and read from the GPIO registers, validating the functionality of the hardware design. The complete design is simulated using **Icarus Verilog**, and the generated waveforms are analyzed using **GTKWave** to verify correct register operations, address decoding, GPIO direction control, and readback behavior. This project demonstrates the complete interaction between software and hardware, providing practical experience in designing custom peripherals and integrating them into an embedded SoC environment.
+
+## Key Learning Outcomes
+
+Through this project, the following concepts were implemented and verified:
+
+- Designed a **multi-register GPIO peripheral** with separate Data, Direction, and Read registers.
+- Implemented **memory-mapped I/O**, allowing software to communicate with hardware using register addresses.
+- Developed **address decoding logic** to select the appropriate GPIO register based on the accessed memory offset.
+- Implemented **GPIO direction control**, enabling each GPIO pin to function as either an input or an output.
+- Designed **GPIO readback logic** to correctly return either the output value or the external input value depending on the configured direction.
+- Integrated the custom GPIO IP into the **RISC-V SoC** and connected it to the processor's memory interface.
+- Wrote and executed **C firmware** to validate GPIO functionality through multiple test cases.
+- Verified the complete design using **RTL simulation** with **Icarus Verilog** and analyzed signal behavior using **GTKWave**.
+- Gained practical understanding of the complete **software → memory bus → GPIO IP → hardware signal** workflow used in modern embedded systems.
+# Tools Used
+
+- Verilog HDL
+- RISC-V SoC
+- Icarus Verilog
+- GTKWave
+- GCC (RISC-V Toolchain)
+- VSDSquadron Environment
+
+---
+
+# Conclusion
+
+This project successfully extends a basic GPIO peripheral into a realistic multi-register IP suitable for integration within a RISC-V SoC. The design supports configurable GPIO direction, output control, and readback through memory-mapped registers. Software running on the processor interacts seamlessly with the hardware using standard memory-mapped I/O, and the functionality has been verified through firmware execution and waveform analysis. The implementation demonstrates the complete software-to-hardware flow expected in modern embedded systems and provides a strong foundation for developing more advanced peripherals such as timers, PWM controllers, and interrupt-driven devices.
+</details>
