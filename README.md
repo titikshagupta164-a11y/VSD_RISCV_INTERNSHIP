@@ -1514,7 +1514,7 @@ A custom 32-bit GPIO peripheral was successfully designed, integrated, and verif
 </details>
 <details>
 <summary><b>Task 5: Design a Multi-Register GPIO IP with Software Control</b></summary>
-    # Design of a Multi-Register GPIO IP with Software Control
+
 
 ## Overview
 
