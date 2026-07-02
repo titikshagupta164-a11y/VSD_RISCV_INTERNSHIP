@@ -1934,8 +1934,6 @@ This project successfully extends a basic GPIO peripheral into a realistic multi
 <details>
 <summary><b>Task 6: Real Peripheral IP Development (Core Contributor Task)
 </b></summary>
-# Memory-Mapped PWM IP for RISC-V SoC
-
 ## Overview
 
 This project implements a **Single-Channel Pulse Width Modulation (PWM) IP** as a **memory-mapped peripheral** for the VSD RISC-V SoC. The IP allows software executing on the RISC-V processor to configure PWM parameters through dedicated memory-mapped registers. The implementation includes RTL design, SoC integration, firmware development, and functional verification using simulation.
