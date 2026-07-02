@@ -1931,57 +1931,68 @@ Through this project, the following concepts were implemented and verified:
 
 This project successfully extends a basic GPIO peripheral into a realistic multi-register IP suitable for integration within a RISC-V SoC. The design supports configurable GPIO direction, output control, and readback through memory-mapped registers. Software running on the processor interacts seamlessly with the hardware using standard memory-mapped I/O, and the functionality has been verified through firmware execution and waveform analysis. The implementation demonstrates the complete software-to-hardware flow expected in modern embedded systems and provides a strong foundation for developing more advanced peripherals such as timers, PWM controllers, and interrupt-driven devices.
 </details>
+
 <details>
 <summary><b>Task 6: Real Peripheral IP Development (Core Contributor Task)
 </b></summary>
+# Task 6: Memory-Mapped PWM IP Integration for RISC-V SoC
+
 ## Overview
 
-This project implements a **Single-Channel Pulse Width Modulation (PWM) IP** as a **memory-mapped peripheral** for the VSD RISC-V SoC. The IP allows software executing on the RISC-V processor to configure PWM parameters through dedicated memory-mapped registers. The implementation includes RTL design, SoC integration, firmware development, and functional verification using simulation.
+This project implements a **Single-Channel Pulse Width Modulation (PWM) IP** as a **memory-mapped peripheral** for the VSD RISC-V SoC. The PWM peripheral enables software running on the RISC-V processor to generate configurable PWM signals through dedicated memory-mapped registers. The project covers the complete design flow, including RTL implementation, SoC integration, firmware development, and functional verification using simulation.
 
-The PWM peripheral supports configurable period and duty cycle, output enable control, selectable output polarity, and a status register. It is integrated into the SoC memory map and validated through a C firmware application and GTKWave simulation.
+The peripheral allows software to configure the PWM period, duty cycle, enable state, and output polarity without modifying the hardware, making it suitable for applications such as LED brightness control, motor speed control, servo interfacing, and other embedded control systems.
 
 ---
 
-## Features
+# Features
 
 - Memory-mapped peripheral interface
-- 32-bit word-aligned register architecture
+- 32-bit register architecture
 - Configurable PWM period
-- Configurable PWM duty cycle
+- Configurable duty cycle
 - PWM enable/disable control
-- Active-high and active-low output polarity
-- Status register for software monitoring
+- Output polarity selection
+- Status register for monitoring
 - Integrated into the VSD RISC-V SoC
-- Verified using firmware and simulation
+- Firmware configurable
+- Functionally verified using GTKWave simulation
 
 ---
 
-## PWM IP Specification
+# PWM IP Specification
 
-The PWM IP generates a digital pulse-width modulated signal suitable for applications such as LED brightness control, servo motor control, and general-purpose digital waveform generation. The processor programs the PWM registers through memory-mapped writes, allowing complete software control over the output waveform.
+The PWM IP generates a pulse-width modulated digital output by comparing an internal counter with a programmable duty-cycle register. The processor controls the peripheral through memory-mapped registers, allowing the PWM waveform to be configured completely in software.
 
-The peripheral follows the standard VSD memory-mapped I/O interface where each register occupies one 32-bit word and is accessed using fixed offsets from the peripheral base address.
+The peripheral contains four registers:
+
+- CTRL
+- PERIOD
+- DUTY
+- STATUS
+
+Each register occupies one 32-bit word and is accessed through the processor's memory-mapped I/O interface.
 
 ---
 
-## Register Map
+# Register Map
 
-**Base Address:** `0x00400000`
+**Peripheral Base Address :** `0x00400000`
 
 | Offset | Register | Access | Description |
 |---------|----------|--------|-------------|
-| 0x40 | CTRL | R/W | Enable and polarity control |
-| 0x44 | PERIOD | R/W | PWM period in clock cycles |
-| 0x48 | DUTY | R/W | PWM high time in clock cycles |
-| 0x4C | STATUS | R | Running status |
+| 0x40 | CTRL | R/W | PWM Enable and Output Polarity |
+| 0x44 | PERIOD | R/W | PWM Period |
+| 0x48 | DUTY | R/W | PWM Duty Cycle |
+| 0x4C | STATUS | Read Only | Current PWM Status |
 
 ---
 
-### Register Description
+## Register Description
 
-#### CTRL Register (0x40)
+### CTRL Register (0x40)
 
-The control register determines whether the PWM output is enabled and selects the output polarity.
+The CTRL register controls the operating mode of the PWM peripheral.
 
 | Bit | Function |
 |-----|----------|
@@ -1989,103 +2000,107 @@ The control register determines whether the PWM output is enabled and selects th
 | Bit 1 | Output Polarity |
 | 31:2 | Reserved |
 
-- **Enable = 1** enables PWM generation.
-- **Enable = 0** forces the output inactive.
-- **Polarity = 0** produces an active-high PWM signal.
-- **Polarity = 1** produces an active-low PWM signal.
+- **Bit 0 = 1** enables PWM generation.
+- **Bit 0 = 0** disables the PWM output.
+- **Bit 1 = 0** generates an active-high PWM waveform.
+- **Bit 1 = 1** generates an active-low PWM waveform.
 
 ---
 
-#### PERIOD Register (0x44)
+### PERIOD Register (0x44)
 
-The PERIOD register stores the total PWM period in clock cycles. The internal counter counts from **0** to **PERIOD − 1** before wrapping back to zero.
+This register stores the PWM period in clock cycles. The internal counter continuously counts from **0** to **PERIOD − 1** before restarting from zero.
 
 Example:
 
-- PERIOD = 100
-- Counter sequence = 0 → 99 → 0
+```
+PERIOD = 100
+
+Counter:
+
+0 → 1 → 2 → ... → 99 → 0
+```
 
 ---
 
-#### DUTY Register (0x48)
+### DUTY Register (0x48)
 
-The DUTY register specifies how long the output remains active during each PWM period.
+The DUTY register determines how long the PWM output remains HIGH during one PWM period.
 
 Example:
 
-- PERIOD = 100
-- DUTY = 40
+```
+PERIOD = 100
+DUTY   = 40
+```
 
-The PWM output remains HIGH for the first 40 clock cycles and LOW for the remaining 60 cycles, producing a **40% duty cycle**.
+The output remains HIGH for the first **40 clock cycles** and LOW for the remaining **60 clock cycles**, producing a **40% duty cycle**.
 
 ---
 
-#### STATUS Register (0x4C)
+### STATUS Register (0x4C)
 
 The STATUS register provides runtime information about the PWM peripheral.
 
+Currently,
+
 - Bit 0 indicates whether PWM generation is enabled.
-- Remaining bits may be extended for additional status information in future revisions.
+- Remaining bits are reserved for future extensions.
 
 ---
 
-## RTL Implementation
+# RTL Implementation
 
-The PWM controller is implemented in **Verilog HDL** (`RTL/pwm.v`). The design consists of five major functional blocks:
+The PWM controller is implemented in **Verilog HDL** (`RTL/pwm.v`). The design follows a synchronous architecture and communicates with the processor through the standard memory-mapped bus interface consisting of address, write data, read data, select, and write-enable signals.
 
-- Memory-mapped register interface
-- Register write logic
-- Register read logic
-- PWM counter
-- PWM output generation
+The module internally consists of:
 
-The module communicates with the processor through the SoC bus using address, data, write-enable, and select signals.
+- Register Interface
+- Register Write Logic
+- Register Read Logic
+- PWM Counter
+- PWM Output Logic
+
+---
+
+## PWM Module
+
+The following figure shows the top-level implementation of the PWM controller. The module exposes the processor interface along with the generated PWM output.
 
 <p align="center">
-    <img src="TASK6/1_t6.jpeg" width="900">
+    <img src="TASK6/14_t6.jpeg" width="900">
+</p>
+
+---
+
+## Register Interface
+
+Four memory-mapped registers are implemented inside the peripheral.
+
+- CTRL Register
+- PERIOD Register
+- DUTY Register
+- STATUS Register
+
+Each register occupies one 32-bit word and is selected using the lower address bits.
+
+<p align="center">
+    <img src="TASK6/3_t6.jpeg" width="850">
 </p>
 
 ---
 
 ## Register Write Logic
 
-Whenever the processor performs a valid write transaction (`sel && we`), the selected register is updated according to the incoming address. This allows software to configure the PWM peripheral dynamically without modifying the hardware.
+Whenever the processor performs a valid write transaction (`sel && we`), the corresponding register is updated according to the selected register address.
 
-The write logic updates:
+The processor can modify:
 
-- CTRL register
-- PERIOD register
-- DUTY register
-- STATUS register (reserved for debugging)
+- CTRL
+- PERIOD
+- DUTY
 
-<p align="center">
-    <img src="TASK6/2_t6.jpeg" width="900">
-</p>
-
----
-
-## Register Read Logic
-
-The read logic returns the contents of the selected register whenever the processor performs a memory read. This enables firmware to verify programmed values and monitor the peripheral status.
-
-The processor can read:
-
-- Control register
-- Period register
-- Duty register
-- Status register
-
-<p align="center">
-    <img src="TASK6/3_t6.jpeg" width="900">
-</p>
-
----
-
-## PWM Counter
-
-The PWM counter increments on every rising clock edge while the PWM module is enabled. When the counter reaches **PERIOD − 1**, it automatically resets to zero, beginning a new PWM cycle.
-
-This counter forms the timing reference used to generate the PWM waveform.
+This enables software to dynamically configure the PWM peripheral during runtime.
 
 <p align="center">
     <img src="TASK6/4_t6.jpeg" width="900">
@@ -2093,157 +2108,251 @@ This counter forms the timing reference used to generate the PWM waveform.
 
 ---
 
+## Register Read Logic
+
+The processor can also read the current contents of every register. The read logic selects the appropriate register based on the incoming address and returns the register contents on the read-data bus.
+
+If an undefined register address is accessed, the peripheral returns zero.
+
+<p align="center">
+    <img src="TASK6/read_t6.jpeg" width="900">
+</p>
+
+---
+
+## PWM Counter
+
+The PWM counter acts as the timing reference for waveform generation.
+
+When PWM is enabled:
+
+- Counter increments every clock cycle.
+- Counter resets to zero after reaching **PERIOD − 1**.
+- A new PWM cycle begins automatically.
+
+<p align="center">
+    <img src="TASK6/pwm_counter_t6.jpeg" width="900">
+</p>
+
+---
+
 ## PWM Output Generation
 
-The PWM waveform is generated by continuously comparing the counter value against the programmed DUTY value.
+The PWM output is generated by continuously comparing the counter value with the programmed DUTY register.
 
 The implemented logic is:
 
 ```verilog
-pwm_raw = (counter < duty)
+pwm_raw = (counter < duty);
 ```
 
-The final output is controlled by the enable and polarity bits stored in the CTRL register.
+The CTRL register controls whether PWM is enabled and also determines the output polarity.
 
-- PWM Enable controls whether output is generated.
-- Polarity selects active-high or active-low output.
-- The output changes automatically whenever the DUTY or PERIOD registers are updated by software.
+- Enable bit activates or disables PWM generation.
+- Polarity bit selects active-high or active-low operation.
+- Changing the PERIOD or DUTY register immediately affects the generated waveform.
 
 <p align="center">
-    <img src="TASK6/5_t6.jpeg" width="900">
+    <img src="TASK6/6b_t6.jpeg" width="900">
 </p>
 
 ---
 
-## SoC Integration
+# SoC Integration
 
-To integrate the PWM peripheral into the existing VSD RISC-V SoC, the following modifications were performed:
+The PWM IP was integrated into the VSD RISC-V SoC as a new memory-mapped peripheral. The integration reuses the existing processor bus and follows the same communication protocol as the other peripherals already present in the system.
 
-- Added the PWM RTL module (`pwm.v`) to the project.
-- Assigned a dedicated I/O address window for the peripheral.
-- Implemented address decoding using the PWM select signal.
-- Connected the processor's address, data, read, and write buses to the PWM module.
-- Routed PWM register read data back to the processor through the shared I/O read multiplexer.
-- Exposed the generated PWM signal as an external SoC output.
+The integration required the following modifications:
 
-The integration follows the common VSD memory-mapped peripheral architecture and maintains compatibility with the existing processor bus.
+- Added `pwm.v` to the RTL project.
+- Allocated a dedicated memory-mapped address region.
+- Added PWM address decoding.
+- Connected processor address, write data, read data, select, and write-enable signals.
+- Connected the generated PWM output to the SoC output.
+
 ---
 
-## RTL Implementation
+## Address Decoding
 
-The PWM peripheral was implemented as a standalone memory-mapped IP (`pwm.v`) and integrated into the existing RISC-V SoC. The design follows synchronous Verilog practices with a clean register interface, reset logic, read/write operations, PWM generation logic, and status reporting.
-
-### PWM Module
-
-The module exposes a simple memory-mapped interface consisting of address, data, read/write control, and PWM output. Four registers are implemented internally to configure the peripheral.
+A dedicated I/O word address bit (`IO_PWM_bit`) is assigned to the PWM peripheral. Whenever the processor accesses this address region, the PWM peripheral is selected and responds to the read or write transaction.
 
 <p align="center">
-  <img src="TASK6/14_t6.jpeg" width="85%">
-</p>
-
-### Register Write Logic
-
-The write logic updates the CTRL, PERIOD, DUTY, and STATUS registers whenever the processor performs a valid write transaction.
-
-<p align="center">
-  <img src="TASK6/13_t6.jpeg" width="85%">
-</p>
-
-### Register Read Logic
-
-The read logic returns the contents of the selected register to the processor based on the register offset. Undefined addresses return zero.
-
-<p align="center">
-  <img src="TASK6/read_t6.jpeg" width="85%">
-</p>
-
-### PWM Counter and Output Generation
-
-A synchronous counter continuously counts from `0` to `PERIOD-1` when the PWM is enabled. The output remains HIGH while the counter value is less than the DUTY register and LOW otherwise. This produces the required PWM waveform.
-
-<p align="center">
-  <img src="TASK6/pwm_counter_t6.jpeg" width="85%">
+    <img src="TASK6/io_a_t6.jpeg" width="900">
 </p>
 
 ---
 
-## SoC Integration
+## PWM Module Instantiation
 
-The PWM IP was integrated into the existing RISC-V SoC by assigning it a dedicated memory-mapped I/O address space. Address decoding logic selects the peripheral whenever the processor accesses the assigned I/O region.
-
-### Address Decoding
-
-The PWM peripheral is enabled using the `IO_PWM_bit`, allowing the processor to communicate with the IP through memory-mapped transactions.
+The PWM controller is instantiated inside the RISC-V SoC and connected directly to the processor bus. The processor communicates with the peripheral using the existing memory-mapped interface, requiring no changes to the processor instruction set.
 
 <p align="center">
-  <img src="TASK6/io_a_t6.jpeg" width="85%">
+    <img src="TASK6/14_t6.jpeg" width="900">
 </p>
+
+---
+
+## Read Data Multiplexer
+
+The PWM peripheral is connected to the shared I/O read-data multiplexer. During read operations, the selected PWM register value is returned to the processor through the common peripheral read path.
+
+<p align="center">
+    <img src="TASK6/io_b_t6.jpeg" width="900">
+</p>
+---
+
+# Firmware Validation
+
+To verify the functionality of the PWM peripheral, a simple firmware application was developed. The firmware configures the PWM registers through the memory-mapped interface, demonstrating successful communication between software and the hardware peripheral.
+
+The firmware performs the following operations:
+
+- Configures the PWM period.
+- Sets the duty cycle.
+- Enables PWM output.
+- Continuously runs while the PWM hardware generates the waveform independently.
+
+---
+
+## Register Definitions
+
+The PWM register offsets are defined inside `Firmware/io.h`. These definitions provide symbolic names for the memory-mapped registers, making the firmware easier to understand and maintain.
+
+The following registers were added:
+
+- `IO_PWM_CTRL`
+- `IO_PWM_PERIOD`
+- `IO_PWM_DUTY`
+- `IO_PWM_STATUS`
+
+<p align="center">
+    <img src="TASK6/io_pwm_t6.jpeg" width="850">
+</p>
+
+---
+
+## PWM Test Program
+
+The firmware configures the PWM IP using memory-mapped writes.
+
+```c
+IO_OUT(IO_PWM_PERIOD,100);
+IO_OUT(IO_PWM_DUTY,40);
+IO_OUT(IO_PWM_CTRL,1);
+```
+
+The above configuration sets:
+
+- **PWM Period = 100 clock cycles**
+- **Duty Cycle = 40 clock cycles**
+- **PWM Enabled**
+
+Once configured, the processor enters an infinite loop while the PWM peripheral continues generating the waveform.
+
+<p align="center">
+    <img src="TASK6/pwm_test_t6.jpeg" width="850">
+</p>
+
+---
+
+# SoC Integration Verification
+
+After integrating the PWM peripheral into the SoC, the address decoder and read-data path were updated to connect the new peripheral with the processor bus.
+
+### Address Decoder
+
+The PWM peripheral is selected using a dedicated address decode signal (`IO_PWM_bit`). Whenever the processor accesses the assigned memory region, the PWM peripheral is enabled for read or write operations.
+
+<p align="center">
+    <img src="TASK6/io_a_t6.jpeg" width="900">
+</p>
+
+---
 
 ### Read Data Multiplexer
 
-The PWM read data is connected to the SoC I/O read multiplexer, allowing software to read register values exactly like other peripherals.
+The PWM read data is connected to the SoC read-data multiplexer (`IO_rdata`). This allows software to read back the values stored in the PWM registers exactly like any other memory-mapped peripheral.
 
 <p align="center">
-  <img src="TASK6/io_b_t6.jpeg" width="85%">
+    <img src="TASK6/io_b_t6.jpeg" width="900">
 </p>
 
 ---
 
-## Software Validation
+# Simulation and Verification
 
-A simple firmware program was written to configure and enable the PWM peripheral.
+The complete SoC, including the newly integrated PWM peripheral, was compiled and simulated using **Icarus Verilog**. Simulation verified that the processor successfully configured the PWM peripheral through the memory-mapped interface.
 
-The software performs the following sequence:
+The following commands were used during simulation:
 
-- Sets the PWM period to **100 clock cycles**
-- Sets the duty cycle to **40 clock cycles**
-- Enables the PWM output
-- Keeps the processor running continuously
+```bash
+iverilog -DBENCH -o sim.vvp ice40_stubs.v gpio_control.v riscv.v
 
-### Register Definitions
+vvp sim.vvp
 
-Memory-mapped register offsets are defined in `io.h`.
+gtkwave sim2.vcd
+```
 
-<p align="center">
-  <img src="TASK6/io_pwm_t6.jpeg" width="80%">
-</p>
-
-### Test Program
-
-The firmware configures the PWM registers using memory-mapped I/O macros.
+The compilation completed successfully without any errors.
 
 <p align="center">
-  <img src="TASK6/pwm_test_t6.jpeg" width="80%">
+    <img src="TASK6/10_t6.jpeg" width="900">
 </p>
 
 ---
 
-## Simulation Results
+# Waveform Analysis
 
-The complete SoC was compiled successfully using **Icarus Verilog** without any compilation errors. The generated simulation executed correctly and produced the VCD waveform.
+The generated waveform was analyzed using **GTKWave** to verify the behavior of the PWM peripheral.
+
+The waveform confirms that:
+
+- The processor successfully writes to the PWM registers.
+- The CTRL register enables the PWM peripheral.
+- The PERIOD register is programmed with **100**.
+- The DUTY register is programmed with **40**.
+- The internal counter increments correctly after enabling the peripheral.
+- The STATUS register reflects the enabled state.
+- The PWM output follows the configured duty cycle and period.
+
+These observations confirm successful end-to-end hardware and software integration.
 
 <p align="center">
-  <img src="TASK6/10_t6.jpeg" width="85%">
-</p>
-
-The waveform confirms successful communication between the processor and the PWM peripheral. The register values are written correctly, the counter increments continuously after enabling the peripheral, and the PWM output follows the configured period and duty cycle.
-
-<p align="center">
-  <img src="TASK6/11_t6.jpeg" width="95%">
+    <img src="TASK6/11_t6.jpeg" width="1000">
 </p>
 
 ---
 
-## Summary
+# Project Structure
 
-This task successfully demonstrates the complete design flow of a custom SoC peripheral.
+```text
+basicRISCV/
+│
+├── RTL/
+│   ├── pwm.v
+│   └── riscv.v
+│
+├── Firmware/
+│   ├── pwm_test.c
+│   └── io.h
+│
+├── TASK6/
+│   ├── io_pwm_t6.jpeg
+│   ├── pwm_test_t6.jpeg
+│   ├── io_a_t6.jpeg
+│   ├── io_b_t6.jpeg
+│   ├── pwm_counter_t6.jpeg
+│   ├── read_t6.jpeg
+│   ├── 10_t6.jpeg
+│   ├── 11_t6.jpeg
+│   ├── 13_t6.jpeg
+│   └── 14_t6.jpeg
+│
+└── README.md
+---
 
-- Designed a memory-mapped PWM IP in Verilog
-- Implemented register read/write interface
-- Generated PWM using configurable PERIOD and DUTY registers
-- Integrated the peripheral into the RISC-V SoC
-- Added memory-mapped address decoding
-- Developed firmware to configure the peripheral
-- Successfully verified functionality through simulation and waveform analysis
+# Conclusion
 
-The implementation satisfies the required task objectives, including RTL design, SoC integration, software validation, and simulation-based verification.
+A configurable **memory-mapped PWM IP** was successfully designed, integrated, and validated within the VSD RISC-V SoC. The processor configures the peripheral entirely through software by writing to dedicated memory-mapped registers, while the hardware generates the corresponding PWM waveform.
+
+Simulation results confirm correct register operation, counter functionality, processor-peripheral communication, and PWM waveform generation, demonstrating successful completion of the complete RTL design, SoC integration, firmware development, and functional verification flow.
