@@ -1933,7 +1933,7 @@ This project successfully extends a basic GPIO peripheral into a realistic multi
 </details>
 
 <details>
-<summary><b>Task 6: Real Peripheral IP Development (Core Contributor Task)
+<summary><b>Task 6: Real Peripheral IP Development (Core Contributor Task)(WIP)
 </b></summary>
 # Task 6: Memory-Mapped PWM IP Integration for RISC-V SoC
 
