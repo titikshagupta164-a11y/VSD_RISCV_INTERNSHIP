@@ -1933,9 +1933,10 @@ This project successfully extends a basic GPIO peripheral into a realistic multi
 </details>
 
 <details>
-<summary><b>Task 6: Real Peripheral IP Development (Core Contributor Task)(WIP)
+<summary><b>Task 6: Real Peripheral IP Development (Core Contributor Task)  PWM IP Spec (Single-Channel PWM)
+
 </b></summary>
-# Task 6: Memory-Mapped PWM IP Integration for RISC-V SoC
+
 
 ## Overview
 
@@ -2068,7 +2069,7 @@ The PWM controller consists of the following major components:
 The following figure shows the top-level implementation of the PWM controller. The module exposes the processor interface, including the memory-mapped bus signals, and generates the PWM output signal that is connected to the SoC.
 
 <p align="center">
-    <img src="TASK6/3_t6.jpeg" width="900">
+    <img src="TASK6/4_t6.jpeg" width="900">
 </p>
 
 *Figure: Top-level implementation of the PWM controller (`pwm.v`).*
