@@ -2322,34 +2322,38 @@ These observations confirm successful end-to-end hardware and software integrati
 </p>
 
 ---
+## Hardware Implementation and Validation
 
-# Project Structure
+After successful synthesis, the generated bitstream (`SOC.bin`) was programmed onto the VSDSquadron FM FPGA board using the `iceprog` utility.
 
-```text
-basicRISCV/
-│
-├── RTL/
-│   ├── pwm.v
-│   └── riscv.v
-│
-├── Firmware/
-│   ├── pwm_test.c
-│   └── io.h
-│
-├── TASK6/
-│   ├── io_pwm_t6.jpeg
-│   ├── pwm_test_t6.jpeg
-│   ├── io_a_t6.jpeg
-│   ├── io_b_t6.jpeg
-│   ├── pwm_counter_t6.jpeg
-│   ├── read_t6.jpeg
-│   ├── 10_t6.jpeg
-│   ├── 11_t6.jpeg
-│   ├── 13_t6.jpeg
-│   └── 14_t6.jpeg
-│
-└── README.md
----
+Programming was completed successfully with the following verification messages:
+
+- `VERIFY OK`
+- `cdone: high`
+
+These messages confirm that the FPGA was successfully configured with the synthesized PWM IP integrated into the RISC-V SoC.
+
+### FPGA Programming
+
+<p align="center">
+  <img src="TASK6/hardware.jpeg" width="1000">
+</p>
+
+*Figure: Successful programming of the FPGA showing `VERIFY OK` and `cdone: high`.*
+
+### Hardware Setup
+
+The synthesized design was deployed onto the VSDSquadron FM FPGA board through the onboard USB programming interface. The board powered up successfully after programming, confirming successful hardware implementation of the integrated design.
+
+<p align="center">
+  <img src="TASK6/flash.jpeg" width="1000">
+</p>
+
+*Figure: VSDSquadron FM FPGA board after successful programming.*
+
+### Hardware Validation
+
+The hardware implementation was validated by successfully programming the FPGA with the generated bitstream. The programming log confirmed successful configuration (`VERIFY OK`), and the FPGA entered the configured state (`cdone: high`). This demonstrates successful deployment of the custom PWM IP integrated into the RISC-V SoC on the target FPGA hardware.
 
 # Conclusion
 
