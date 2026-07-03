@@ -2336,7 +2336,7 @@ These messages confirm that the FPGA was successfully configured with the synthe
 ### FPGA Programming
 
 <p align="center">
-  <img src="TASK6/hardware.jpeg width="1000">
+  <img src="TASK6/hardware.jpeg" width="1000">
 </p>
 
 *Figure: Successful programming of the FPGA showing `VERIFY OK` and `cdone: high`.*
