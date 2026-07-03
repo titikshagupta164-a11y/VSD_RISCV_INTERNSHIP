@@ -2126,7 +2126,7 @@ If an undefined register address is accessed, the peripheral returns a default v
 This mechanism enables software to verify register contents and monitor the status of the PWM peripheral during execution.
 
 <p align="center">
-    <img src="TASK6/6a_t6.jpeg" width="900">
+    <img src="TASK6/read_t6.jpeg" width="900">
 </p>
 
 *Figure: Register read logic returning the selected register contents to the processor.*
@@ -2175,7 +2175,7 @@ The generated output depends on the configuration stored in the CTRL register.
 Changing either the PERIOD or DUTY register immediately affects the generated PWM waveform without requiring any hardware modification.
 
 <p align="center">
-    <img src="TASK6/7_t6.jpeg" width="900">
+    <img src="TASK6/8_t6.jpeg" width="900">
 </p>
 
 *Figure: PWM output generation logic using the counter, duty-cycle register, and control bits.*
@@ -2310,7 +2310,7 @@ gtkwave sim2.vcd
 The design compiled successfully without any compilation errors, and the generated VCD file was used for waveform analysis in GTKWave.
 
 <p align="center">
-    <img src="TASK6/12_t6.jpeg" width="900">
+    <img src="TASK6/13_t6.jpeg" width="900">
 </p>
 
 *Figure: Successful compilation and simulation of the integrated SoC using Icarus Verilog.*
@@ -2334,7 +2334,7 @@ The simulation confirms the following observations:
 These observations verify the correct interaction between the processor, memory-mapped registers, and PWM hardware.
 
 <p align="center">
-    <img src="TASK6/13_t6.jpeg" width="1000">
+    <img src="TASK6/14_t6.jpeg" width="1000">
 </p>
 
 *Figure: GTKWave simulation showing PWM register values, counter operation, and generated PWM waveform.*
@@ -2364,7 +2364,7 @@ The following programming log confirms successful configuration of the FPGA.
 The generated bitstream was successfully deployed onto the VSDSquadron FM FPGA board. After programming, the board powered up correctly, indicating successful hardware implementation of the integrated design.
 
 <p align="center">
-    <img src="TASK6/flash.jpeg" width="500">
+    <img src="TASK6/flash1.jpeg" width="500">
 </p>
 
 *Figure: VSDSquadron FM FPGA board after successful programming.*
