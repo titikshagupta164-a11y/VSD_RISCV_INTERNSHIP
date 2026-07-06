@@ -422,3 +422,141 @@ End
 - Setting DUTY equal to PERIOD produces a continuously HIGH output.
 - The PWM waveform is generated entirely in hardware after configuration.
 - Software only needs to update register values whenever a different frequency or duty cycle is required.
+
+
+# <img src="https://img.icons8.com/color/48/000000/5-circle.png" width="28"/> Register Map
+
+The PWM controller exposes four memory-mapped registers through the VSDSquadron memory bus. These registers allow software to configure the PWM output waveform by controlling the enable bit, period, duty cycle, and status.
+
+---
+
+## Register Summary
+
+- **Base Address:** `0x00400040`
+- **Bus Width:** 32-bit, word-aligned
+- **Addressing:** Base + Offset
+
+| Offset Address | Absolute Address | Register | R/W | Description |
+|---------------:|:----------------:|:--------:|:---:|-------------|
+| 0x00 | 0x00400040 | CTRL | R/W | PWM control register (Enable / Invert) |
+| 0x04 | 0x00400044 | PERIOD | R/W | PWM period register |
+| 0x08 | 0x00400048 | DUTY | R/W | PWM duty cycle register |
+| 0x0C | 0x0040004C | STATUS | R | PWM status register |
+
+---
+
+# CTRL : Control Register (Offset 0x00)
+
+- **Address:** `0x00400040`
+- **Access:** Read / Write
+- **Reset Value:** `0x00000000`
+
+| Bits | Field | R/W | Reset | Description |
+|------|------|-----|-------|-------------|
+| 0 | EN | R/W | 0 | Enables PWM output |
+| 1 | INV | R/W | 0 | Inverts PWM output |
+| 31:2 | Reserved | - | 0 | Reserved |
+
+### Register Description
+
+The CTRL register controls the overall operation of the PWM controller.
+
+- **EN = 0** → PWM output remains LOW.
+- **EN = 1** → PWM waveform is generated.
+- **INV = 0** → Normal PWM polarity.
+- **INV = 1** → Inverted PWM polarity.
+
+---
+
+# PERIOD : Period Register (Offset 0x04)
+
+- **Address:** `0x00400044`
+- **Access:** Read / Write
+- **Reset Value:** `0x00000064` (100)
+
+| Bits | Field | R/W | Reset | Description |
+|------|------|-----|-------|-------------|
+|31:0|PERIOD|R/W|100|PWM period in clock cycles|
+
+### Register Description
+
+The PERIOD register determines the number of system clock cycles that make up one complete PWM cycle.
+
+The internal counter increments every clock cycle and automatically resets when the programmed period is reached.
+
+Increasing the PERIOD value decreases the PWM frequency, while decreasing the PERIOD value increases the PWM frequency.
+
+---
+
+# DUTY : Duty Register (Offset 0x08)
+
+- **Address:** `0x00400048`
+- **Access:** Read / Write
+- **Reset Value:** `0x00000000`
+
+| Bits | Field | R/W | Reset | Description |
+|------|------|-----|-------|-------------|
+|31:0|DUTY|R/W|0|PWM HIGH time in clock cycles|
+
+### Register Description
+
+The DUTY register specifies the number of clock cycles during which the PWM output remains HIGH within each PWM period.
+
+The PWM controller continuously compares:
+
+```text
+counter < duty
+```
+
+If the comparison is true, the output is HIGH; otherwise, it is LOW.
+
+Typical examples:
+
+| PERIOD | DUTY | Duty Cycle |
+|---------|------|-----------|
+|100|0|0%|
+|100|25|25%|
+|100|50|50%|
+|100|75|75%|
+|100|100|100%|
+
+---
+
+# STATUS : Status Register (Offset 0x0C)
+
+- **Address:** `0x0040004C`
+- **Access:** Read-Only
+- **Reset Value:** `0x00000000`
+
+| Bits | Field | R/W | Reset | Description |
+|------|------|-----|-------|-------------|
+|0|EN_STATUS|R|0|Reflects current PWM enable state|
+|31:1|Reserved|-|0|Reserved|
+
+### Register Description
+
+The STATUS register allows software to determine whether the PWM controller is currently enabled.
+
+The value of bit 0 always mirrors the Enable bit stored in the CTRL register.
+
+Example:
+
+```c
+uint32_t status = IO_IN(IO_PWM_STATUS);
+
+if(status & 0x1)
+{
+    // PWM enabled
+}
+```
+
+---
+
+## Register Programming Notes
+
+- Configure **PERIOD** before enabling PWM.
+- Ensure **DUTY ≤ PERIOD** for predictable waveform generation.
+- Changing PERIOD immediately changes the PWM frequency.
+- Changing DUTY immediately changes the pulse width.
+- STATUS is read-only and is intended for software monitoring.
+- Reserved bits should always be written as zero.
