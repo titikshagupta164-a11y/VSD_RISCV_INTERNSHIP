@@ -1,4 +1,5 @@
 
+
 # <img src="https://img.icons8.com/color/48/000000/1-circle.png" width="28"/> IP Overview
 
 ## 🔗 What Is This IP?
@@ -152,10 +153,8 @@ Example:
 The following figure illustrates the overall architecture of the PWM IP and its integration with the VSDSquadron RISC-V SoC. The processor accesses the PWM controller through the memory-mapped bus, allowing software to configure the PWM registers. Internally, the controller uses a counter and comparator to generate the PWM waveform based on the programmed period and duty cycle.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/1b8f8fa4-46c6-458b-9e68-a3f34c7e5ed7" alt="PWM IP" width="900">
+  <img src="https://github.com/user-attachments/assets/01fabe43-f1d0-456d-8b40-699186696d59"  alt="pwm_ip" width="1536">
 </p>
-
-<p align="center">
 <b>Figure 1.</b> Overall architecture of the PWM IP showing memory-mapped interface, internal PWM logic, and output generation.
 </p>
 
