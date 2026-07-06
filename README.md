@@ -2403,5 +2403,5 @@ The project highlights the complete embedded hardware development workflow, from
 ## Task-7: Commercial Grade PWM IP Development
 
 ### Click on this **[Link](TASK7/README.md)** to access the complete documentation and RTL files.
-
+</details>
 ---
