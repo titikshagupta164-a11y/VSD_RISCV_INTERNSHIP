@@ -178,10 +178,25 @@ localparam IO_PWM_bit = 4;
 ## PWM IP Instantiation
 
 ```verilog
+//====================================================
+// PWM IP Instantiation
+//====================================================
 pwm_control pwm_inst (
-    ...
+
+    .clk(clk),
+    .resetn(resetn),
+
+    .sel(pwm_sel),
+    .we(mem_wstrb),
+
+    .addr(mem_addr),
+    .wdata(mem_wdata),
+
+    .rdata(pwm_rdata),
+
+    .pwm_out(PWM_OUT)
+
 );
-```
 
 ---
 
