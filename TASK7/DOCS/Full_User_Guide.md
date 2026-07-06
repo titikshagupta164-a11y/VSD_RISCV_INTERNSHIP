@@ -424,139 +424,143 @@ End
 - Software only needs to update register values whenever a different frequency or duty cycle is required.
 
 
-# <img src="https://img.icons8.com/color/48/000000/5-circle.png" width="28"/> Register Map
+# <img src="https://img.icons8.com/color/48/000000/5-circle.png" width="28"/> Validation and Expected Behaviour
 
-The PWM controller exposes four memory-mapped registers through the VSDSquadron memory bus. These registers allow software to configure the PWM output waveform by controlling the enable bit, period, duty cycle, and status.
-
----
-
-## Register Summary
-
-- **Base Address:** `0x00400040`
-- **Bus Width:** 32-bit, word-aligned
-- **Addressing:** Base + Offset
-
-| Offset Address | Absolute Address | Register | R/W | Description |
-|---------------:|:----------------:|:--------:|:---:|-------------|
-| 0x00 | 0x00400040 | CTRL | R/W | PWM control register (Enable / Invert) |
-| 0x04 | 0x00400044 | PERIOD | R/W | PWM period register |
-| 0x08 | 0x00400048 | DUTY | R/W | PWM duty cycle register |
-| 0x0C | 0x0040004C | STATUS | R | PWM status register |
+The PWM IP was validated through RTL simulation and integrated into the VSDSquadron RISC-V SoC. The verification process confirmed correct register operation, counter functionality, and PWM waveform generation based on the configured period and duty cycle values.
 
 ---
 
-# CTRL : Control Register (Offset 0x00)
+## RTL Simulation
 
-- **Address:** `0x00400040`
-- **Access:** Read / Write
-- **Reset Value:** `0x00000000`
+The PWM controller was simulated using the provided Verilog testbench and GTKWave.
 
-| Bits | Field | R/W | Reset | Description |
-|------|------|-----|-------|-------------|
-| 0 | EN | R/W | 0 | Enables PWM output |
-| 1 | INV | R/W | 0 | Inverts PWM output |
-| 31:2 | Reserved | - | 0 | Reserved |
+The simulation verified:
 
-### Register Description
+- Correct memory-mapped register write operations.
+- Proper initialization of CTRL, PERIOD, DUTY, and STATUS registers.
+- Counter increment on every clock cycle when PWM is enabled.
+- Automatic counter reset after reaching the programmed period.
+- Correct comparison between the counter and DUTY register.
+- Expected PWM waveform generation.
 
-The CTRL register controls the overall operation of the PWM controller.
+<p align="center">
+    <img src="images/pwm_waveform.png" width="900">
+</p>
 
-- **EN = 0** → PWM output remains LOW.
-- **EN = 1** → PWM waveform is generated.
-- **INV = 0** → Normal PWM polarity.
-- **INV = 1** → Inverted PWM polarity.
-
----
-
-# PERIOD : Period Register (Offset 0x04)
-
-- **Address:** `0x00400044`
-- **Access:** Read / Write
-- **Reset Value:** `0x00000064` (100)
-
-| Bits | Field | R/W | Reset | Description |
-|------|------|-----|-------|-------------|
-|31:0|PERIOD|R/W|100|PWM period in clock cycles|
-
-### Register Description
-
-The PERIOD register determines the number of system clock cycles that make up one complete PWM cycle.
-
-The internal counter increments every clock cycle and automatically resets when the programmed period is reached.
-
-Increasing the PERIOD value decreases the PWM frequency, while decreasing the PERIOD value increases the PWM frequency.
+<p align="center">
+<b>Figure 2.</b> GTKWave simulation showing PWM waveform generation.
+</p>
 
 ---
 
-# DUTY : Duty Register (Offset 0x08)
+## Functional Verification
 
-- **Address:** `0x00400048`
-- **Access:** Read / Write
-- **Reset Value:** `0x00000000`
+The following functionality was verified during simulation:
 
-| Bits | Field | R/W | Reset | Description |
-|------|------|-----|-------|-------------|
-|31:0|DUTY|R/W|0|PWM HIGH time in clock cycles|
-
-### Register Description
-
-The DUTY register specifies the number of clock cycles during which the PWM output remains HIGH within each PWM period.
-
-The PWM controller continuously compares:
-
-```text
-counter < duty
-```
-
-If the comparison is true, the output is HIGH; otherwise, it is LOW.
-
-Typical examples:
-
-| PERIOD | DUTY | Duty Cycle |
-|---------|------|-----------|
-|100|0|0%|
-|100|25|25%|
-|100|50|50%|
-|100|75|75%|
-|100|100|100%|
+| Feature | Verification Status |
+|----------|---------------------|
+| Register Read/Write | ✅ Verified |
+| PWM Enable Control | ✅ Verified |
+| Counter Operation | ✅ Verified |
+| Period Configuration | ✅ Verified |
+| Duty Cycle Configuration | ✅ Verified |
+| PWM Output Generation | ✅ Verified |
 
 ---
 
-# STATUS : Status Register (Offset 0x0C)
+## Hardware Validation
 
-- **Address:** `0x0040004C`
-- **Access:** Read-Only
-- **Reset Value:** `0x00000000`
+The PWM IP was successfully integrated into the VSDSquadron SoC and programmed onto the FPGA.
 
-| Bits | Field | R/W | Reset | Description |
-|------|------|-----|-------|-------------|
-|0|EN_STATUS|R|0|Reflects current PWM enable state|
-|31:1|Reserved|-|0|Reserved|
+The build process, synthesis, place-and-route, and FPGA programming completed successfully. A constant HIGH output corresponding to a 100% duty cycle was observed during hardware testing.
 
-### Register Description
-
-The STATUS register allows software to determine whether the PWM controller is currently enabled.
-
-The value of bit 0 always mirrors the Enable bit stored in the CTRL register.
-
-Example:
-
-```c
-uint32_t status = IO_IN(IO_PWM_STATUS);
-
-if(status & 0x1)
-{
-    // PWM enabled
-}
-```
+Intermediate duty-cycle values are expected to generate PWM waveforms according to the programmed register values. Verification of these waveforms is recommended using an oscilloscope or logic analyzer connected to the `pwm_out` signal.
 
 ---
 
-## Register Programming Notes
+## Expected Behaviour
 
-- Configure **PERIOD** before enabling PWM.
-- Ensure **DUTY ≤ PERIOD** for predictable waveform generation.
-- Changing PERIOD immediately changes the PWM frequency.
-- Changing DUTY immediately changes the pulse width.
-- STATUS is read-only and is intended for software monitoring.
-- Reserved bits should always be written as zero.
+The PWM controller is expected to operate as follows:
+
+1. Software writes the PERIOD register.
+2. Software writes the DUTY register.
+3. Software enables the PWM controller through the CTRL register.
+4. The internal counter increments continuously.
+5. The comparator evaluates `counter < duty`.
+6. The output logic generates the corresponding PWM waveform.
+7. The waveform continues until the controller is disabled or new configuration values are written.
+
+---
+
+## Expected PWM Characteristics
+
+| Parameter | Behaviour |
+|-----------|-----------|
+| DUTY = 0 | Output remains LOW |
+| DUTY = PERIOD | Output remains HIGH |
+| 0 < DUTY < PERIOD | PWM waveform generated |
+| CTRL.EN = 0 | PWM disabled |
+| CTRL.EN = 1 | PWM enabled |
+
+---
+
+# <img src="https://img.icons8.com/color/48/000000/6-circle.png" width="28"/> Known Limitations
+
+The current implementation of the PWM IP is intended as a lightweight, educational memory-mapped peripheral for the VSDSquadron FPGA platform. While suitable for a wide range of embedded applications, the present version has the following limitations.
+
+---
+
+## Functional Limitations
+
+- Supports only a single PWM output channel.
+- Does not generate interrupts.
+- No dead-time insertion for complementary outputs.
+- No phase-shift control.
+- No prescaler or programmable clock divider.
+- No hardware fault protection.
+- No DMA support.
+
+---
+
+## Timing Limitations
+
+- PWM frequency depends directly on the fixed system clock.
+- Maximum achievable frequency is limited by the FPGA system clock.
+- Very small period values may reduce duty-cycle resolution.
+
+---
+
+## Register Limitations
+
+- Duty cycle should not exceed the configured PERIOD value.
+- Reserved register bits should always be written as zero.
+- STATUS register reports only the PWM enable state.
+
+---
+
+## Hardware Considerations
+
+- Intermediate duty-cycle values are best verified using an oscilloscope or logic analyzer.
+- Visible LED brightness changes depend on both PWM frequency and the connected load.
+- Proper FPGA pin assignment is required for observing the PWM output on external hardware.
+
+---
+
+## Future Improvements
+
+The PWM IP can be extended with additional functionality, including:
+
+- Multi-channel PWM support
+- Programmable clock prescaler
+- Interrupt generation
+- Center-aligned PWM
+- Complementary PWM outputs
+- Dead-time insertion
+- Runtime frequency scaling
+- Capture and measurement support
+- Hardware fault detection
+- Advanced motor-control features
+
+---
+
+The modular architecture of the PWM IP allows these enhancements to be incorporated with minimal impact on the existing software interface.
