@@ -445,7 +445,7 @@ The simulation verified:
 - Expected PWM waveform generation.
 
 <p align="center">
-    <img src="TASK6/14_t6.jpeg" width="900">
+    <img src="../../TASK6/14_t6.jpeg" width="900">
 </p>
 
 <p align="center">
