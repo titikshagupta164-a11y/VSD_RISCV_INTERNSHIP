@@ -1,17 +1,3 @@
-# RTL Folder Structure
-
-```
-RTL/
-├── pwm.v                     # Main PWM IP module
-├── riscv.v                   # SoC integration (modified)
-└── README.md                 # RTL description (optional)
-```
-
-> **Note:** `pwm_test.c` belongs in the `SOFTWARE/` folder, **not** in `RTL/`.
->
-> If you do not have `pwm_testbench.v`, it is perfectly fine to omit it instead of adding a fake testbench.
-
----
 
 # pwm.v
 
@@ -41,52 +27,112 @@ localparam REG_STATUS = 2'b11;
 
 ---
 
-## Write Logic
+//====================================================
+// Write Logic
+//====================================================
+always @(posedge clk) begin
+    if (!resetn) begin
+        ctrl   <= 32'd0;
+        period <= 32'd100;
+        duty   <= 32'd0;
+        status <= 32'd0;
+    end
+    else begin
+        if (sel && we) begin
+            case (reg_sel)
 
-```verilog
-// Write logic
-always @(posedge clk)
-begin
-    ...
+                REG_CTRL:
+                    ctrl <= wdata;
+
+                REG_PERIOD:
+                    period <= wdata;
+
+                REG_DUTY:
+                    duty <= wdata;
+
+                REG_STATUS:
+                    status <= wdata;
+
+                default:
+                    ;
+
+            endcase
+        end
+    end
 end
-```
-
 ---
 
 ## Read Logic
 
 ```verilog
-// Read logic
-always @(*)
-begin
-    ...
+//====================================================
+// Read Logic
+//====================================================
+always @(*) begin
+    rdata = 32'd0;
+
+    if (sel && !we) begin
+        case (reg_sel)
+
+            REG_CTRL:
+                rdata = ctrl;
+
+            REG_PERIOD:
+                rdata = period;
+
+            REG_DUTY:
+                rdata = duty;
+
+            REG_STATUS:
+                rdata = status;
+
+            default:
+                rdata = 32'd0;
+
+        endcase
+    end
 end
-```
 
 ---
 
 ## PWM Counter
 
 ```verilog
+//====================================================
 // PWM Counter
-always @(posedge clk)
-begin
-    ...
+//====================================================
+always @(posedge clk) begin
+    if (!resetn)
+        counter <= 32'd0;
+
+    else if (ctrl[0]) begin
+
+        if (counter >= period - 1)
+            counter <= 32'd0;
+
+        else
+            counter <= counter + 1;
+
+    end
+
+    else
+        counter <= 32'd0;
 end
-```
 
 ---
 
 ## Status Register
 
-```verilog
+//====================================================
 // Status Register
-always @(posedge clk)
-begin
-    ...
-end
-```
+//====================================================
+always @(posedge clk) begin
+    if (!resetn)
+        status <= 32'd0;
 
+    else
+        status <= {31'd0, ctrl[0]};
+end
 ---
 
 ## PWM Output Generation
@@ -151,28 +197,4 @@ wire [31:0] IO_rdata =
 
 ---
 
-# SOFTWARE Folder
 
-```
-SOFTWARE/
-└── pwm_test.c
-```
-
-This firmware configures the PWM peripheral by writing the PERIOD, DUTY and CTRL registers.
-
----
-
-# README.md (RTL)
-
-```markdown
-# RTL Files
-
-This folder contains the RTL implementation of the PWM IP.
-
-## Files
-
-- **pwm.v** — Main PWM peripheral
-- **riscv.v** — PWM integration into the VSDSquadron SoC
-
-The PWM IP is memory mapped and accessed through the CPU using memory-mapped I/O transactions.
-```
