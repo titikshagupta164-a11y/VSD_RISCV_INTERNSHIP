@@ -2398,7 +2398,7 @@ This project successfully demonstrates the complete development and integration 
 
 The project highlights the complete embedded hardware development workflow, from RTL design and SoC integration to firmware development, simulation, synthesis, FPGA programming, and hardware validation.
 
-
+</details>
 <details>
 <summary><b>Task 7: Commercial-Grade IP Documentation & Release
 </b></summary>
