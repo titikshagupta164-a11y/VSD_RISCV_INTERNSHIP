@@ -2089,12 +2089,6 @@ The implemented registers are:
 
 Each register occupies one 32-bit word and is selected using the lower address bits of the incoming memory-mapped address.
 
-<p align="center">
-    <img src="TASK6/4_t6.jpeg" width="850">
-</p>
-
-*Figure: Register definitions used by the PWM controller.*
-
 ---
 
 ## Register Write Logic
