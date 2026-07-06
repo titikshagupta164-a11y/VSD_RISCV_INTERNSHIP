@@ -2401,6 +2401,8 @@ The project highlights the complete embedded hardware development workflow, from
 
 <details>
 <summary><b>Task 7: Commercial-Grade IP Documentation & Release
+</b></summary>
+
 # Commercial Grade PWM IP Documentation
 
 ## PWM Controller IP – VSDSquadron FPGA
