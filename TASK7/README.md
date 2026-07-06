@@ -1,4 +1,3 @@
-###Task 7: Commercial-Grade IP Documentation & Release
 
 # Commercial Grade PWM IP Documentation
 
