@@ -68,17 +68,9 @@ reg [31:0] counter;
 
 ---
 
-# Quick Integration (3 Steps)
+# Quick Integration
 
-## Step 1: Copy RTL File
-
-```text
-RTL/pwm.v
-```
-
----
-
-## Step 2: Instantiate PWM IP inside SoC
+## Step 1: Instantiate PWM IP inside SoC
 
 ```verilog
 pwm_control pwm_inst (
@@ -95,7 +87,7 @@ pwm_control pwm_inst (
 
 ---
 
-## Step 3: Add Address Decode
+## Step 2: Add Address Decode
 
 ```verilog
 localparam IO_PWM_bit = 4;
