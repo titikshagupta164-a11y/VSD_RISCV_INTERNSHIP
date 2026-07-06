@@ -2547,17 +2547,12 @@ assign pwm_out = ctrl[0] ?
 
 # Project Structure
 
-```text
-IP_PWM/
-│
-├── RTL/
-│   ├── pwm.v
-│   └── pwm_testbench.v
-│
-├── DOCS/
-│
-├── SOFTWARE/
-│
-└── README.md
-```
+| Document | Location |
+|----------|----------|
+| Full User Guide | [IP_PWM/DOCS/Full_User_Guide.md](DOCS/Full_User_Guide.md) |
+| Integration Guide | [IP_PWM/DOCS/Integration_Guide.md](DOCS/Integration_Guide.md) |
+| Register Map | [IP_PWM/DOCS/Register_Map.md](DOCS/Register_Map.md) |
+| Example Software | [IP_PWM/DOCS/Example_Software.md](DOCS/Example_Software.md) |
+| Firmware Source | [IP_PWM/SOFTWARE/pwm_test.c](SOFTWARE/pwm_test.c) |
+| RTL Source | [IP_PWM/RTL](RTL/) |
 </details>
