@@ -1,6 +1,4 @@
-<details>
-<summary><b>Task 7: Commercial-Grade IP Documentation & Release
-</b></summary>
+###Task 7: Commercial-Grade IP Documentation & Release
 
 # Commercial Grade PWM IP Documentation
 
@@ -154,4 +152,4 @@ assign pwm_out = ctrl[0] ?
 | Example Software | [IP_PWM/DOCS/Example_Software.md](DOCS/Example_Software.md) |
 | Firmware Source | [IP_PWM/SOFTWARE/pwm_test.c](SOFTWARE/pwm_test.c) |
 | RTL Source | [IP_PWM/RTL](RTL/) |
-</details>
+
