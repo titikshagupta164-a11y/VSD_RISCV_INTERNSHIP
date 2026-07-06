@@ -250,3 +250,175 @@ The overall operation of the PWM controller follows this sequence:
 4. The comparator compares the counter value against the programmed duty cycle.
 5. The output logic generates the PWM waveform.
 6. The waveform is continuously produced until the configuration registers are updated or the controller is disabled.
+
+
+# <img src="https://img.icons8.com/color/48/000000/4-circle.png" width="28"/> Software Programming Model
+
+## How Software Controls the PWM IP
+
+The PWM controller is completely software programmable through four memory-mapped registers. The RISC-V processor configures the PWM output by writing to the control, period, and duty cycle registers using ordinary memory write instructions.
+
+Unlike dedicated PWM peripherals that require complex configuration sequences, this implementation follows a simple register-based programming model. Once configured, the hardware automatically generates the PWM waveform without further CPU intervention until new values are written.
+
+---
+
+## Programming Sequence
+
+The recommended sequence for configuring the PWM controller is:
+
+1. Program the desired PWM period.
+2. Program the required duty cycle.
+3. Enable the PWM output by writing to the CTRL register.
+4. Read the STATUS register whenever software needs to verify whether the PWM output is enabled.
+5. Update PERIOD or DUTY at runtime whenever a new waveform is required.
+
+---
+
+## Initialization Example
+
+```c
+// Configure PWM period
+IO_OUT(IO_PWM_PERIOD, 100);
+
+// Configure duty cycle
+IO_OUT(IO_PWM_DUTY, 40);
+
+// Enable PWM
+IO_OUT(IO_PWM_CTRL, 1);
+```
+
+The above configuration generates a PWM waveform with:
+
+- Period = 100 clock cycles
+- Duty = 40 clock cycles
+- Duty Cycle = 40%
+
+---
+
+## Register Access Flow
+
+The software interacts with the PWM controller through the following sequence:
+
+```
+CPU
+ │
+ │ Write PERIOD
+ ▼
+PERIOD Register
+
+ │
+ │ Write DUTY
+ ▼
+DUTY Register
+
+ │
+ │ Write CTRL
+ ▼
+CTRL Register
+
+ │
+ ▼
+PWM Hardware
+
+ │
+ ▼
+PWM Output
+```
+
+---
+
+## Runtime Parameter Update
+
+One of the major advantages of the PWM IP is that both the period and duty cycle can be modified while the processor is running.
+
+Changing the duty cycle immediately affects the pulse width of the generated waveform, while updating the period changes the PWM frequency. Since both values are stored in hardware registers, software can continuously adjust the output waveform without modifying the RTL implementation.
+
+Example:
+
+```c
+// Increase brightness
+IO_OUT(IO_PWM_DUTY, 80);
+
+// Reduce brightness
+IO_OUT(IO_PWM_DUTY, 20);
+
+// Change PWM frequency
+IO_OUT(IO_PWM_PERIOD, 200);
+```
+
+---
+
+## Reading the Status Register
+
+The STATUS register allows software to determine whether the PWM controller is currently enabled.
+
+```c
+uint32_t status = IO_IN(IO_PWM_STATUS);
+
+if(status & 0x1)
+{
+    // PWM is enabled
+}
+else
+{
+    // PWM is disabled
+}
+```
+
+Bit 0 of the STATUS register reflects the enable state of the controller, while all remaining bits are reserved.
+
+---
+
+## Typical Software Flow
+
+```
+Start
+
+   │
+   ▼
+
+Write PERIOD
+
+   │
+   ▼
+
+Write DUTY
+
+   │
+   ▼
+
+Write CTRL (Enable)
+
+   │
+   ▼
+
+Hardware Generates PWM
+
+   │
+   ▼
+
+(Optional)
+
+Read STATUS
+
+   │
+   ▼
+
+Update DUTY/PERIOD if required
+
+   │
+   ▼
+
+End
+```
+
+---
+
+## Software Design Notes
+
+- PERIOD should always be greater than zero.
+- DUTY should not exceed the programmed PERIOD value.
+- A duty cycle of zero generates a continuously LOW output.
+- Setting DUTY equal to PERIOD produces a continuously HIGH output.
+- The PWM waveform is generated entirely in hardware after configuration.
+- Software only needs to update register values whenever a different frequency or duty cycle is required.
